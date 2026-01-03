@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import ApiResponse from "../utils/ApiResponse.js";
 
-function verifyAuthentication(req, res, next) {
+function handelUserAuthentication(req, res, next) {
   try {
     const token =
       req.cookies?.token ||
@@ -24,4 +24,4 @@ function verifyAuthentication(req, res, next) {
   }
 }
 
-export { verifyAuthentication };
+export { handelUserAuthentication };
