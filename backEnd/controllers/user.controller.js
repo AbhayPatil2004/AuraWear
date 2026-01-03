@@ -2,10 +2,10 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import setJwtTokenCookie from "../utils/setJwtCookie.js";
 import ApiResponse from "../utils/ApiResponse.js";
-import sendOtpToMail from "../utils/sentOtpToMail.js";
+import sendMailToUser from "../utils/sendMail.js";
 import saveOtp from "../utils/otpStore.js";
 import redisClient from "../redisConnect/redisConnect.js";
-
+import otpBody from "../utils/otpEmailBody.js";
 
 function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
@@ -52,15 +52,16 @@ async function handleUserSignUp(req, res) {
     const otp = generateOtp();
 
     await saveOtp(email, otp)
-    await sendOtpToMail(email, otp)
+    const subject = "To verify Email Through Otp"
+    sendMailToUser( email , subject , otpBody( username , otp ) )
 
     return res.status(201).json(
-      new ApiResponse(201, { user }, "User registered successfully")
+      new ApiResponse(201, {  }, "User registered successfully")
     );
 
   } catch (error) {
-    console.error("Signup error:", error);
 
+    console.error("Signup error:", error);
 
     return res.status(500).json(
       new ApiResponse(500, null, "Internal server error")
@@ -139,12 +140,14 @@ async function handelUserLogout(req, res) {
 }
 
 async function verifyEmailOtp(req, res) {
-  try {
-    const { email, otp } = req.body;
 
-    if (!email || !otp) {
+  try {
+    const { otp } = req.body; 
+    const { email } = req.user; 
+
+    if (!otp) {
       return res.status(400).json(
-        new ApiResponse(400, null, "Email and OTP are required")
+        new ApiResponse(400, null, "OTP is required")
       );
     }
 
@@ -170,17 +173,8 @@ async function verifyEmailOtp(req, res) {
       );
     }
 
-    const updatedUser = await User.findOneAndUpdate(
-      { email },
-      { isEmailVerified: true },
-      { new: true }
-    );
-
-    if (!updatedUser) {
-      return res.status(500).json(
-        new ApiResponse(500, null, "Something went wrong")
-      );
-    }
+    existingUser.isEmailVerified = true;
+    await existingUser.save();
 
     await redisClient.del(key);
 
@@ -195,6 +189,7 @@ async function verifyEmailOtp(req, res) {
     );
   }
 }
+
 
 
 export { handleUserSignUp, verifyEmailOtp, handelUserLogin , handelUserLogout };

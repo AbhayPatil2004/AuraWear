@@ -1,18 +1,15 @@
-import redisClient from "../redisConnect/redisConnect.js";
-
 async function saveOtp(email, otp) {
-
-  console.log("Otp saving")
-  const otpData = {
-    otp: 123456,
-    email: "abc@gmail.com",
-  };
+  const key = `otp:${email}`;
 
   await redisClient.set(
-    "otp:abc@gmail.com",
-    JSON.stringify(otpData)
+    key,
+    otp.toString(),   // store only OTP
+    {
+      EX: 300         // ⏱️ expires in 5 minutes
+    }
   );
 
+  console.log("OTP saved in Redis");
 }
 
-export default saveOtp
+export default saveOtp;
