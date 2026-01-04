@@ -19,6 +19,12 @@ const storeSchema = new mongoose.Schema(
       maxlength: 50,
     },
 
+    storeProducts :[
+      {
+        type : String ,
+        required : true
+      }
+    ],
     description: {
       type: String,
       maxlength: 500,
@@ -68,8 +74,9 @@ const storeSchema = new mongoose.Schema(
     },
     
     isApproved: {
-      type: Boolean,
-      default: false, 
+      type: String,
+      enukm : ["pending","accepted" ,"rejected"],
+      default: "pending", 
     },
 
     isActive: {

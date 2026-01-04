@@ -54,7 +54,7 @@ async function handleCreateStore(req, res) {
       address,
       logo: logoUrl,
       banner: bannerUrl,
-      isApproved: false,
+      isApproved: "pending",
       isActive: true,
       subscriptionPlan: "trial",
       trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)

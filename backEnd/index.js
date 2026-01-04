@@ -9,6 +9,7 @@ import connectTODB from './dbConnect/dbConnect.js';
 import { connectRedis } from './redisConnect/redisConnect.js';
 import userRouter from './routes/user.route.js';
 import storeRouter from './routes/store.route.js'
+import adminRouter from './routes/admin.route.js'
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(cookieParser());
 
 app.use("/user", userRouter);
 app.use("/store" , storeRouter )
+app.use("/admin",adminRouter) 
 
 const PORT = process.env.PORT || 3000;
 

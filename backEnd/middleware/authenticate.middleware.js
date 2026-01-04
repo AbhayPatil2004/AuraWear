@@ -14,12 +14,12 @@ function handelUserAuthentication(req, res, next) {
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
     
     req.user = {
       _id: decoded.userId,
       email: decoded.email,
       username: decoded.username,
+      role : decoded.role
     };
 
     next();
