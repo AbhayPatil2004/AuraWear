@@ -52,13 +52,7 @@ const userSchema = new mongoose.Schema(
       enum: ["buyer", "seller", "admin"],
       default: "buyer",
     },
-
-    wishlist: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
-      },
-    ],
+    
     orders: [
       {
         type: mongoose.Schema.Types.ObjectId,
@@ -87,10 +81,12 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-
-    refreshToken: {
-      type: String,
-    },
+    
+    searchHistory: [
+      {
+        type : String,
+      },
+    ],
   },
   { timestamps: true }
 );

@@ -18,35 +18,15 @@ const recommendationSchema = new mongoose.Schema(
 
     viewedProducts: [
       {
-        productId: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "Product",
-        },
-        viewedAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
-
-    searchHistory: [
-      {
-        keyword: String,
-        searchedAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
-
-    recommendedProducts: [
-      {
         type: mongoose.Schema.Types.ObjectId,
         ref: "Product",
       },
     ],
+    
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Recommendation", recommendationSchema);
+const reccomendProduct = mongoose.model("Recommendation" , recommendationSchema )
+
+export default reccomendProduct
