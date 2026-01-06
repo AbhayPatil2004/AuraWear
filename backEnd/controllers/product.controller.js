@@ -6,8 +6,8 @@ import sponserProduct from "../models/sponser.model.js";
 async function handelGetallProducts(req, res) {
     try {
         const products = await Product.find()
-            .populate("store")   // store info
-            .populate("seller"); // seller info
+            .populate("store")   
+            .populate("seller"); 
 
         return res.status(200).json(
             new ApiResponse(200, { products }, "Products sent successfully")
@@ -109,7 +109,7 @@ async function handelGetRecommendedProducts(req, res) {
 async function handelGetSponseredProducts(req, res) {
   try {
     
-    const sponsoredProducts = await sponsoredProducts.find({})
+    const sponsoredProducts = await sponserProduct.find({})
       .populate("product") 
       .populate("store")   
       .populate("seller")  
@@ -144,7 +144,7 @@ async function handelGetSponseredStoreProducts(req, res) {
       );
     }
 
-    const sponsoredProducts = await SponsoredProduct.find({
+    const sponsoredProducts = await sponserProduct.find({
       store: storeId
     })
       .populate("product") 
