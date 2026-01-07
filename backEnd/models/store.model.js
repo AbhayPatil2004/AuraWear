@@ -2,14 +2,14 @@ import mongoose from "mongoose";
 
 const storeSchema = new mongoose.Schema(
   {
-    
+
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true,
     },
-    
+
     storeName: {
       type: String,
       required: [true, "Store name is required"],
@@ -19,10 +19,10 @@ const storeSchema = new mongoose.Schema(
       maxlength: 50,
     },
 
-    storeProducts :[
+    storeProducts: [
       {
-        type : String ,
-        required : true
+        type: String,
+        required: true
       }
     ],
     description: {
@@ -50,7 +50,7 @@ const storeSchema = new mongoose.Schema(
         default: "India",
       },
     },
-    
+
     rating: {
       type: Number,
       default: 0,
@@ -72,18 +72,18 @@ const storeSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    
+
     isApproved: {
       type: String,
-      enukm : ["pending","accepted" ,"rejected"],
-      default: "pending", 
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
     },
 
     isActive: {
       type: Boolean,
       default: true,
     },
-    
+
     subscriptionPlan: {
       type: String,
       enum: ["trial", "basic", "pro", "premium"],
@@ -102,15 +102,16 @@ const storeSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    
+
     trialEndsAt: {
       type: Date,
     },
-    
+
     commissionRate: {
       type: Number,
-      default: 0, 
+      default: 0,
     },
+    
   },
   {
     timestamps: true,

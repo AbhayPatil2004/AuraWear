@@ -27,6 +27,6 @@ const recommendationSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const reccomendProduct = mongoose.model("Recommendation" , recommendationSchema )
+const ReccomendProduct = mongoose.model("Recommendation" , recommendationSchema )
 
-export default reccomendProduct
+export default ReccomendProduct

@@ -29,6 +29,6 @@ const sponsoredProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const sponserProduct = mongoose.model("SponsserProduct" , sponsoredProductSchema)
+const SponserProduct = mongoose.model("SponsserProduct" , sponsoredProductSchema)
 
-export default sponserProduct
+export default SponserProduct
