@@ -11,7 +11,8 @@ import userRouter from './routes/user.route.js';
 import storeRouter from './routes/store.route.js'
 import adminRouter from './routes/admin.route.js'
 import productRouter from './routes/product.route.js'
-
+import cartRouter from './routes/cart.route.js'
+import reviewRouter from './routes/review.route.js'
 const app = express();
 
 app.use(cors({
@@ -26,6 +27,8 @@ app.use("/user", userRouter);
 app.use("/store" , storeRouter )
 app.use("/admin",adminRouter) 
 app.use("/product" , productRouter )
+app.use("/cart" , cartRouter )
+app.use("/revire" , reviewRouter )
 
 const PORT = process.env.PORT || 3000;
 
