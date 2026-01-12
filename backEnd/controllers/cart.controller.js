@@ -154,5 +154,19 @@ async function handelRemoveProductFromCart(req, res) {
   }
 }
 
+async function handelClearCart(req, res) {
+  try {
+    await Cart.deleteMany({});
 
-export { handelGetCartProduct , handelAddProductInCart , handelRemoveProductFromCart }
+    return res.status(200).json(
+      new ApiResponse(200, {}, "All users deleted successfully")
+    );
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Something went wrong")
+    );
+  }
+}
+
+export { handelGetCartProduct , handelAddProductInCart , handelRemoveProductFromCart , handelClearCart }

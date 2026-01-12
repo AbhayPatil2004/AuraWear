@@ -259,4 +259,20 @@ async function handelForgotPassword(req, res) {
   }
 }
 
-export { handleUserSignUp, handelVerifyEmailOtp , handelUserLogin, handelUserLogout , handelForgotPassword };
+async function handelClearUser(req, res) {
+  try {
+    await User.deleteMany({});
+
+    return res.status(200).json(
+      new ApiResponse(200, {}, "All users deleted successfully")
+    );
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Something went wrong")
+    );
+  }
+}
+
+
+export { handleUserSignUp, handelVerifyEmailOtp , handelUserLogin, handelUserLogout , handelForgotPassword , handelClearUser };

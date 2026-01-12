@@ -101,5 +101,19 @@ async function handelGetProductReviews(req, res) {
   }
 }
 
+async function handelClearReview(req, res) {
+  try {
+    await Review.deleteMany({});
 
-export { handelAddProdcutReview , handelGetProductReviews };
+    return res.status(200).json(
+      new ApiResponse(200, {}, "All Reviews deleted successfully")
+    );
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Something went wrong")
+    );
+  }
+}
+
+export { handelAddProdcutReview , handelGetProductReviews , handelClearReview };

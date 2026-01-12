@@ -1,134 +1,180 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "next/navigation"
 
-export default function Signup() {
-  const router = useRouter();
-  const [formData, setFormData] = useState({
-    username: "",
-    email: "",
-    password: "",
-  });
+export default function SignupPage() {
 
-  const [message, setMessage] = useState("");
-  const [loading, setLoading] = useState(false);
+    const router = useRouter()
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
+    const [formData, setFormData] = useState({
+        username: "",
+        email: "",
+        password: "",
     });
-  };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setMessage("");
+    const [loading, setLoading] = useState(false);
+    const [message, setMessage] = useState("");
+    const [error, setError] = useState("");
+    const [showPassword, setShowPassword] = useState(false);
 
-    try {
-      const response = await fetch("http://localhost:8000/user/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
 
-      let data;
-      try {
-        data = await response.json();
-      } catch {
-        data = { message: response.statusText };
-      }
-
-      if (response.ok) {
-        setMessage(`✅ ${data.message || "Signup successful!"}`);
-        setFormData({ username: "", email: "", password: "" });
-        // redirect to verify email page
-        setTimeout(() => router.push("/verifyEmail"), 1500);
-      } else {
-        setMessage(`❌ ${data.error || data.message || "Signup failed."}`);
-      }
-    } catch (err) {
-      console.error("Network error:", err);
-      setMessage("❌ Something went wrong. Check server or network.");
-    } finally {
-      setLoading(false);
+    function handleChange(e) {
+        const { name, value } = e.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
     }
-  };
 
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-black">
-      <div className="bg-gray-900 text-white p-10 rounded-2xl shadow-xl w-full max-w-md">
-        <h2 className="text-3xl font-bold mb-6 text-center text-blue-400">
-          Create Account
-        </h2>
+    async function handleSubmit(e) {
+        e.preventDefault();
+        setMessage("");
+        setError("");
+        setLoading(true);
 
-        {message && (
-          <div
-            className={`mb-4 text-center text-sm ${
-              message.startsWith("✅") ? "text-green-400" : "text-red-400"
-            }`}
-          >
-            {message}
-          </div>
-        )}
+        try {
+            const res = await fetch("http://localhost:8000/user/signup", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData),
+            });
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block mb-2 font-semibold">Username</label>
-            <input
-              type="text"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              placeholder="Enter your username"
-              className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
-              required
-            />
-          </div>
+            const data = await res.json();
 
-          <div>
-            <label className="block mb-2 font-semibold">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              placeholder="Enter your email"
-              className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
-              required
-            />
-          </div>
+            if (!res.ok) setError(data.message || "Signup failed");
+            else {
+                setMessage(data.message);
+                setFormData({ username: "", email: "", password: "" });
 
-          <div>
-            <label className="block mb-2 font-semibold">Password</label>
-            <input
-              type="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Enter your password"
-              className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-400"
-              required
-            />
-          </div>
+                setTimeout(() => {
+                    router.push("/verifyemailotp"); // or "/verify-otp" or "/dashboard"
+                },1500)
+            }
+        } catch {
+            setError("Something went wrong. Please try again.");
+        } finally {
+            setLoading(false);
+        }
+    }
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-500 hover:bg-blue-600 transition text-white font-semibold py-3 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-400 disabled:opacity-50"
-          >
-            {loading ? "Signing Up..." : "Sign Up"}
-          </button>
-        </form>
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
 
-        <p className="mt-6 text-center text-gray-400 text-sm">
-          Already have an account?{" "}
-          <a href="/auth/login" className="text-blue-400 hover:underline">
-            Login
-          </a>
-        </p>
-      </div>
-    </div>
-  );
+                {/* Header */}
+                <div className="text-center mb-6">
+                    <h1 className="text-3xl font-bold text-gray-800">
+                        Create Account
+                    </h1>
+                    <p className="text-gray-500 text-sm mt-1">
+                        Sign up to get started 🚀
+                    </p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+
+                    {/* Username */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Username
+                        </label>
+                        <input
+                            type="text"
+                            name="username"
+                            value={formData.username}
+                            onChange={handleChange}
+                            placeholder="abhay123"
+                            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                            required
+                        />
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Email
+                        </label>
+                        <input
+                            type="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="you@example.com"
+                            className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                            required
+                        />
+                    </div>
+
+                    {/* Password */}
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                            Password
+                        </label>
+
+                        <div className="relative">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                value={formData.password}
+                                onChange={handleChange}
+                                placeholder="Enter password"
+                                autoComplete="new-password"
+                                style={{
+                                    WebkitTextSecurity: showPassword ? "none" : "disc", // 🔥 REAL FIX
+                                }}
+                                className="w-full rounded-lg border border-gray-300 px-4 py-2 pr-10
+             text-gray-800 bg-white
+             focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none"
+                                required
+                            />
+
+
+                            {/* Eye Icon */}
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="cursor-pointer absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                            >
+                                {showPassword ? "🙈" : "👁️"}
+                            </button>
+                        </div>
+
+                        <p className="text-xs text-gray-400 mt-1">
+                            Min 6 chars, uppercase, lowercase & symbol
+                        </p>
+                    </div>
+
+
+                    {/* Error */}
+                    {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-3 py-2">
+                            {error}
+                        </div>
+                    )}
+
+                    {/* Success */}
+                    {message && (
+                        <div className="bg-green-50 border border-green-200 text-green-600 text-sm rounded-lg px-3 py-2">
+                            {message}
+                        </div>
+                    )}
+
+                    {/* Button */}
+                    <button
+                        type="submit"
+                        disabled={loading}
+                        className="cursor-pointer w-full py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold hover:opacity-90 transition disabled:opacity-60"
+                    >
+                        {loading ? "Creating account..." : "Sign Up"}
+                    </button>
+                </form>
+
+                {/* Footer */}
+                <p className="text-center text-sm text-gray-500 mt-6">
+                    Already have an account?{" "}
+                    <span className="text-blue-600 hover:underline cursor-pointer">
+                        Login
+                    </span>
+                </p>
+            </div>
+        </div>
+    );
 }

@@ -173,4 +173,19 @@ async function handelPlaceCartItemsOrder(req, res) {
   }
 }
 
-export { handelPlaceSingelItemOrder , handelPlaceCartItemsOrder }
+async function handelClearOrder(req, res) {
+  try {
+    await Order.deleteMany({});
+
+    return res.status(200).json(
+      new ApiResponse(200, {}, "All Order deleted successfully")
+    );
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Something went wrong")
+    );
+  }
+}
+
+export { handelPlaceSingelItemOrder , handelPlaceCartItemsOrder , handelClearOrder}

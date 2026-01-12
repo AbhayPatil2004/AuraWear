@@ -108,7 +108,6 @@ async function handleCreateStore(req, res) {
       );
     }
 
-
     const existingStore = await Store.findOne({ storeName });
     if (existingStore) {
       return res.status(409).json(
@@ -171,7 +170,21 @@ async function handleCreateStore(req, res) {
   }
 }
 
+async function handelClearStore(req, res) {
+  try {
+    await Store.deleteMany({});
 
-export { handleCreateStore, handelGetAllStores, handelGetSearchedStore };
+    return res.status(200).json(
+      new ApiResponse(200, {}, "All Stores deleted successfully")
+    );
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Something went wrong")
+    );
+  }
+}
+
+export { handleCreateStore, handelGetAllStores, handelGetSearchedStore , handelClearStore };
 
 

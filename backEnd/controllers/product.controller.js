@@ -10,7 +10,6 @@ async function handelGetallProducts(req, res) {
       .populate("store", "_id")
       .populate("seller", "_id");
 
-
     return res.status(200).json(
       new ApiResponse(200, { products }, "Products sent successfully")
     );
@@ -193,6 +192,7 @@ async function handelAddProduct(req, res) {
   try {
     const sellerId = req.user._id;
 
+    
     const {
       title,
       description,
@@ -224,7 +224,6 @@ async function handelAddProduct(req, res) {
         new ApiResponse(400, {}, "Required fields are missing")
       );
     }
-
 
     const store = await Store.findOne({ owner: sellerId });
 
@@ -266,4 +265,19 @@ async function handelAddProduct(req, res) {
   }
 }
 
-export { handelAddProduct, handelGetallProducts, handelGetRecommendedProducts, handelGetSearchProducts, handelGetSponseredProducts, handelGetSponseredStoreProducts }
+async function handelClearProduct(req, res) {
+  try {
+    await Product.deleteMany({});
+
+    return res.status(200).json(
+      new ApiResponse(200, {}, "All Products deleted successfully")
+    );
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Something went wrong")
+    );
+  }
+}
+
+export { handelAddProduct, handelGetallProducts, handelGetRecommendedProducts, handelGetSearchProducts, handelGetSponseredProducts, handelGetSponseredStoreProducts , handelClearProduct }
