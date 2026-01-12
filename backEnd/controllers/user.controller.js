@@ -31,13 +31,13 @@ async function handleUserSignUp(req, res) {
         new ApiResponse(409, null, "User already exists")
       );
     }
-    
+
     const strongPasswordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/;
 
     if (!strongPasswordRegex.test(password)) {
       return res.status(400).json(
-        new ApiResponse( 400 , {} , "Password must be at least 6 characters and include uppercase, lowercase, number, and special character")
+        new ApiResponse(400, {}, "Password must be at least 6 characters and include uppercase, lowercase, number, and special character")
       );
     }
 
@@ -63,7 +63,10 @@ async function handleUserSignUp(req, res) {
     await saveOtp(email, otp)
     const subject = "To verify Email Through Otp"
     sendMailToUser(email, subject, otpBody(username, otp))
-
+      .catch(err => {
+        console.error("Email failed:", err);
+        // optional: retry / log / alert
+      });
     return res.status(201).json(
       new ApiResponse(201, { user }, "User registered successfully")
     );
@@ -100,6 +103,7 @@ async function handelUserLogin(req, res) {
         new ApiResponse(400, {}, "Invalid email address")
       );
     }
+    
 
     const passwordCorrect = await bcrypt.compare(password, user.password);
     if (!passwordCorrect) {
@@ -159,7 +163,7 @@ async function handelUserLogout(req, res) {
   }
 }
 
-async function verifyEmailOtp(req, res) {
+async function handelVerifyEmailOtp(req, res) {
 
   try {
     const { otp } = req.body;
@@ -210,4 +214,49 @@ async function verifyEmailOtp(req, res) {
   }
 }
 
-export { handleUserSignUp, verifyEmailOtp, handelUserLogin, handelUserLogout };
+async function handelForgotPassword(req, res) {
+
+  try {
+
+    const { email } = req.body;
+
+    if (!email || email.trim() === "" || !email.endsWith("@gmail.com")) {
+      return res.status(400).json(
+        new ApiResponse(400, {}, "Valid Gmail address is required")
+      );
+    }
+
+    const user = await User.findOne({ email: email })
+
+    if (!user) {
+      return res.status(400).json(
+        new ApiResponse(400, {}, "User Dont exits with this email")
+      );
+    }
+
+    setJwtTokenCookie(res, user)
+
+    const { username } = user ;
+    const otp = generateOtp();
+
+    await saveOtp(email, otp)
+    const subject = "To verify user through Through Otp"
+    sendMailToUser(email, subject, otpBody(username, otp))
+      .catch(err => {
+        console.error("Email failed:", err);
+        // optional: retry / log / alert
+      });
+    return res.status(200).json(
+      new ApiResponse(200, {}, "Otp send Succesfully")
+    );
+
+  }
+  catch (error) {
+    console.log(error)
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Something went wrong")
+    )
+  }
+}
+
+export { handleUserSignUp, handelVerifyEmailOtp , handelUserLogin, handelUserLogout , handelForgotPassword };

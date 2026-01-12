@@ -5,14 +5,13 @@ import { handleCreateStore , handelGetAllStores , handelGetSearchedStore} from '
 const router = express.Router()
 
 router.post(
-  "/createstore",
+  "/create",
   handelUserAuthentication,
-  
   handleCreateStore
 );
 
-router.get("/getallstores" , handelGetAllStores)
-router.post("/searchstore" , handelGetSearchedStore )
+router.get("/" , handelGetAllStores)
+router.post("/search" , handelGetSearchedStore )
 
 export default router
  

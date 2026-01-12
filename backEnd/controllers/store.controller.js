@@ -41,7 +41,7 @@ async function handelGetAllStores(req, res) {
 async function handelGetSearchedStore(req, res) {
   try {
     let { searchString } = req.body;
-    
+
     if (!searchString || !searchString.trim()) {
       return res.status(400).json(
         new ApiResponse(400, {}, "Please enter a valid store name")
@@ -50,22 +50,22 @@ async function handelGetSearchedStore(req, res) {
 
     searchString = searchString.trim();
     const now = new Date();
-    
+
     const stores = await Store.find({
-      storeName: { $regex: searchString, $options: "i" }, // case-insensitive
+      storeName: { $regex: searchString, $options: "i" },
       isActive: true,
       $or: [
         {
           subscriptionPlan: "trial",
-          trialEndsAt: { $gt: now }
+          trialEndsAt: { $exists: true, $gt: now }
         },
         {
           isSubscriptionActive: true,
-          subscriptionEndDate: { $gt: now }
+          subscriptionEndDate: { $exists: true, $gt: now }
         }
       ]
-    })
-    .lean();
+    }).lean();
+
 
     return res.status(200).json(
       new ApiResponse(200, stores, "Stores are sent successfully")
@@ -83,6 +83,13 @@ async function handelGetSearchedStore(req, res) {
 async function handleCreateStore(req, res) {
 
   try {
+
+    if (req.user.role == "admin") {
+      return res.status(400).json(
+        new ApiResponse(400, {}, "Admins are noy Allowed to open store")
+      );
+    }
+
     const {
       storeName,
       description,
@@ -165,6 +172,6 @@ async function handleCreateStore(req, res) {
 }
 
 
-export { handleCreateStore, handelGetAllStores , handelGetSearchedStore };
+export { handleCreateStore, handelGetAllStores, handelGetSearchedStore };
 
 
