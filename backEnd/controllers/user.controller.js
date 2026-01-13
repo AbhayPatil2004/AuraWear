@@ -284,7 +284,7 @@ async function handelResendOtp(req, res) {
         
       });
     return res.status(201).json(
-      new ApiResponse(201, { user }, "User registered successfully")
+      new ApiResponse(201, {  }, "Otp send Succesfully")
     );
   }
   catch (error) {

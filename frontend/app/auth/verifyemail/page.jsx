@@ -33,7 +33,7 @@ export default function VerifyEmailOtpPage() {
       } else {
         setMessage(data.message || "Email verified successfully");
 
-        // ⏳ Show message then redirect
+        
         setTimeout(() => {
           router.push("/");
         }, 1500);
@@ -42,6 +42,29 @@ export default function VerifyEmailOtpPage() {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function resendOtp(e){
+
+    e.preventDefault()
+    try{
+      const res = await fetch("http://localhost:8000/user/resendotp" , {
+        method : "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      })
+
+      const data = await res.json()
+      if( res.ok ){
+        setMessage(data.message || "Otp Send Succesfully");
+      }
+      else{
+        setError( data.message || "Something went wrong. Please try again.");
+      }
+    }
+    catch(error){
+      setError("Something went wrong. Please try again.");
     }
   }
 
@@ -105,7 +128,7 @@ export default function VerifyEmailOtpPage() {
         {/* Footer */}
         <p className="text-center text-sm text-gray-500 mt-6">
           Didn’t receive OTP?{" "}
-          <span className="text-blue-600 hover:underline cursor-pointer">
+          <span className="text-blue-600 hover:underline cursor-pointer "  onClick={ resendOtp }>
             Resend
           </span>
         </p>
