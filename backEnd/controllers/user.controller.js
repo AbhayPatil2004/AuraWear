@@ -11,6 +11,32 @@ function generateOtp() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+async function handleGetUserDetails(req, res) {
+  try {
+    const { _id } = req.user;
+
+    const user = await User.findById(_id)
+      .select("-password ");
+
+    if (!user) {
+      return res.status(404).json(
+        new ApiResponse(404, null, "User not found")
+      );
+    }
+
+    return res.status(200).json(
+      new ApiResponse(200, user, "User fetched successfully")
+    );
+  } catch (error) {
+    console.error("Get User Error:", error);
+
+    return res.status(500).json(
+      new ApiResponse(500, null, "Internal server error")
+    );
+  }
+}
+
+
 async function handleUserSignUp(req, res) {
 
   try {
@@ -92,11 +118,7 @@ async function handelUserLogin(req, res) {
 
   try {
 
-    if (req.user.email) {
-      return res.status(400).json(
-        new ApiResponse(400, {}, "You are already login")
-      );
-    }
+    
     const { email, password } = req.body || {};
 
     if (!email || !password) {
@@ -379,4 +401,4 @@ async function handelClearUser(req, res) {
 }
 
 
-export { handleUserSignUp, handelVerifyEmailOtp, handelUserLogin, handelUserLogout, handelForgotPassword, handelClearUser, handelResendOtp, handelForgotPasswordOtp , handelResetPassword };
+export { handleGetUserDetails , handleUserSignUp, handelVerifyEmailOtp, handelUserLogin, handelUserLogout, handelForgotPassword, handelClearUser, handelResendOtp, handelForgotPasswordOtp , handelResetPassword };

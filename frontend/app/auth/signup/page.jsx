@@ -56,6 +56,13 @@ export default function SignupPage() {
         }
     }
 
+    function redirectLogin(e){
+        e.preventDefault()
+
+        router.push("/auth/login")
+
+    }
+
     return (
         <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
             <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
@@ -171,7 +178,7 @@ export default function SignupPage() {
                 {/* Footer */}
                 <p className="text-center text-sm text-gray-500 mt-6">
                     Already have an account?{" "}
-                    <span className="text-blue-600 hover:underline cursor-pointer">
+                    <span className="text-blue-600 hover:underline cursor-pointer" onClick={redirectLogin}>
                         Login
                     </span>
                 </p>

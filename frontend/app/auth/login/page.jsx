@@ -23,7 +23,7 @@ export default function LoginPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-        credentials: "include", 
+        credentials: "include",
       });
 
       const data = await res.json();
@@ -32,7 +32,7 @@ export default function LoginPage() {
         setError(data.message || "Invalid credentials");
       } else {
         setMessage(data.message || "Login successful");
-        
+
         setTimeout(() => {
           router.push("/");
         }, 1500);
@@ -54,7 +54,7 @@ export default function LoginPage() {
             Login
           </h1>
           <p className="text-gray-500 text-sm mt-1">
-            Welcome back 👋 Please login to continue
+            Welcome back Please login to continue
           </p>
         </div>
 
@@ -117,15 +117,27 @@ export default function LoginPage() {
         </form>
 
         {/* Footer */}
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Don’t have an account?{" "}
+        <p className="text-center text-sm text-gray-500 mt-6 flex justify-center gap-2">
+          Don’t have an account?
           <span
             className="text-blue-600 hover:underline cursor-pointer"
-            onClick={() => router.push("/signup")}
+            onClick={() => router.push("/auth/signup")}
           >
             Sign up
           </span>
+          <span
+            className="text-gray-400" // optional separator color
+          >
+            |
+          </span>
+          <span
+            className="text-blue-600 hover:underline cursor-pointer"
+            onClick={() => router.push("/auth/forgotpassword")}
+          >
+            Forgot Password
+          </span>
         </p>
+
       </div>
     </div>
   );
