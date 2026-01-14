@@ -132,7 +132,7 @@ async function handleCreateStore(req, res) {
       isApproved: "pending",
       isActive: true,
       subscriptionPlan: "trial",
-      trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+      // trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
     });
 
     const admins = await User.find({ role: "admin" });
