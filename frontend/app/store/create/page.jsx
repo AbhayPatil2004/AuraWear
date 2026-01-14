@@ -10,16 +10,40 @@ export default function CreateStorePage() {
     storeName: "",
     description: "",
     storeProducts: "",
-    address: ""
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      postalCode: "",
+      country: "India"
+    }
   });
+
 
   const [logo, setLogo] = useState(null);
   const [banner, setBanner] = useState(null);
   const [loading, setLoading] = useState(false);
 
   function handleChange(e) {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+
+    if (name.startsWith("address.")) {
+      const field = name.split(".")[1];
+      setFormData((prev) => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          [field]: value
+        }
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value
+      }));
+    }
   }
+
 
   // 🔹 Upload image using YOUR backend Cloudinary API
   async function uploadImage(file) {
@@ -143,17 +167,52 @@ export default function CreateStorePage() {
           </div>
 
           {/* Address */}
-          <div>
-            <label className="block text-sm font-medium text-black  mb-1">
-              Store Address
-            </label>
-            <input
-              name="address"
-              placeholder="Store address"
-              onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-            />
-          </div>
+         {/* Address Section */}
+<div className="space-y-4">
+  <h3 className="text-lg font-semibold text-black">
+    Store Address
+  </h3>
+
+  <input
+    name="address.street"
+    placeholder="Street Address"
+    onChange={handleChange}
+    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-black"
+  />
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <input
+      name="address.city"
+      placeholder="City"
+      onChange={handleChange}
+      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-black"
+    />
+
+    <input
+      name="address.state"
+      placeholder="State"
+      onChange={handleChange}
+      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-black"
+    />
+  </div>
+
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <input
+      name="address.postalCode"
+      placeholder="Postal Code"
+      onChange={handleChange}
+      className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-black"
+    />
+
+    <input
+      name="address.country"
+      value={formData.address.country}
+      disabled
+      className="w-full rounded-lg border border-gray-200 bg-gray-100 px-4 py-2 text-gray-600"
+    />
+  </div>
+</div>
+
 
           {/* Upload Section */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
