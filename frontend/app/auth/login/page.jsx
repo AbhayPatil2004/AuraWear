@@ -33,6 +33,9 @@ export default function LoginPage() {
       } else {
         setMessage(data.message || "Login successful");
 
+        localStorage.setItem("user", JSON.stringify(data.data.user))
+
+
         setTimeout(() => {
           router.push("/");
         }, 1500);

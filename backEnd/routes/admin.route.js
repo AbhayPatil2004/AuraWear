@@ -6,10 +6,10 @@ import handelUserAuthorization from '../middleware/admin.authorized.middleware.j
 
 const router = express.Router()
 
-router.get( "/storeopeningreq" , handelUserAuthentication , handelUserAuthorization , handelStoreOpeningReq )
+router.get( "/openingreq" , handelUserAuthentication , handelUserAuthorization , handelStoreOpeningReq )
 // router.post("/approvestore/:storeId" , handelUserAuthentication , handelUserAuthorization , handelApproveStore )
 // router.post("/rejectstore/:storeId" , handelUserAuthentication , handelUserAuthorization , handelApproveStore )
-router.post("/approvestore" , handelUserAuthentication , handelUserAuthorization , handelApproveStore )
-router.post("/rejectstore" , handelUserAuthentication , handelUserAuthorization , handelRejectStore )
+router.patch("/accept" , handelUserAuthentication , handelUserAuthorization , handelApproveStore )
+router.patch("/reject" , handelUserAuthentication , handelUserAuthorization , handelRejectStore )
 
 export default router

@@ -75,7 +75,7 @@ async function handelUpdateProfile(req, res) {
   }
 }
 
- 
+
 const handelUpdateUserAddress = async (req, res) => {
   try {
     console.log("➡️ Update Address API HIT");
@@ -248,6 +248,7 @@ async function handelUserLogin(req, res) {
       _id: user._id,
       username: user.username,
       email: user.email,
+      role : user.role 
     };
 
     console.log("Login in Succesfull")
@@ -488,4 +489,4 @@ async function handelClearUser(req, res) {
 }
 
 
-export { handleGetUserDetails , handelUpdateProfile , handelUpdateUserAddress , handleUserSignUp, handelVerifyEmailOtp, handelUserLogin, handelUserLogout, handelForgotPassword, handelClearUser, handelResendOtp, handelForgotPasswordOtp, handelResetPassword };
+export { handleGetUserDetails, handelUpdateProfile, handelUpdateUserAddress, handleUserSignUp, handelVerifyEmailOtp, handelUserLogin, handelUserLogout, handelForgotPassword, handelClearUser, handelResendOtp, handelForgotPasswordOtp, handelResetPassword };

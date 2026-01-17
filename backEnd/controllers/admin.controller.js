@@ -6,48 +6,46 @@ import storeApprovedEmailBody from "../emailBody/storeApproves.emailBody.js";
 import storeRejectedEmailBody from "../emailBody/storeReject.emailBody.js";
 
 async function handelStoreOpeningReq(req, res) {
+  try {
+    const stores = await Store.find({ isApproved: "pending" })
+      .populate("owner", "username avatar");
 
-    try {
-
-        console.log(req)
-        const stores = await Store.find({ isApproved: "pending" });
-
-        if (!stores.length) {
-            return res.status(200).json(
-                new ApiResponse(
-                    200,
-                    [],
-                    "No pending store approval requests"
-                )
-            );
-        }
-
-        return res.status(200).json(
-            new ApiResponse(
-                200,
-                stores,
-                "Pending stores fetched successfully"
-            )
-        );
-
-    } catch (error) {
-        console.error("Store approval fetch error:", error);
-
-        return res.status(500).json(
-            new ApiResponse(
-                500,
-                {},
-                "Internal server error"
-            )
-        );
+    if (!stores.length) {
+      return res.status(200).json(
+        new ApiResponse(
+          200,
+          [],
+          "No pending store approval requests"
+        )
+      );
     }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        stores,
+        "Pending stores fetched successfully"
+      )
+    );
+
+  } catch (error) {
+    console.error("Store approval fetch error:", error);
+
+    return res.status(500).json(
+      new ApiResponse(
+        500,
+        {},
+        "Internal server error"
+      )
+    );
+  }
 }
 
 
 async function handelApproveStore(req, res) {
     try {
-        // const { storeId } = req.params;
-        const storeId = "69611cad8c7df554b09ba502"
+        const { storeId } = req.params;
+        // const storeId = "69611cad8c7df554b09ba502"
 
         const store = await Store.findById(storeId)
             .populate("owner", "username email");
@@ -57,10 +55,10 @@ async function handelApproveStore(req, res) {
                 new ApiResponse(404, {}, "Store not found")
             );
         }
-        
+
         const trialEndsAt = new Date();
         trialEndsAt.setDate(trialEndsAt.getDate() + 7);
-       
+
         store.isApproved = "accepted";
         store.trialEndsAt = trialEndsAt;
         await store.save();
@@ -68,14 +66,14 @@ async function handelApproveStore(req, res) {
         const ownerId = store.owner._id;
         const ownerName = store.owner.username;
         const ownerEmail = store.owner.email;
-        
+
         await User.findByIdAndUpdate(ownerId, {
             role: "seller"
         });
-        
+
         const subject = "Your Store is Approved";
         const body = storeApprovedEmailBody(ownerName, store.storeName);
-        
+
         sendMailToUser(ownerEmail, subject, body);
 
         return res.status(200).json(
@@ -93,8 +91,9 @@ async function handelApproveStore(req, res) {
 
 async function handelRejectStore(req, res) {
     try {
-        
-        const storeId = "695a9d7d800fbcb71de03c57"; // temp for testing
+
+        // const storeId = "695a9d7d800fbcb71de03c57"; // temp for testing
+        const { storeId } = req.params;
 
         const store = await Store.findById(storeId)
             .populate("owner", "username email");
@@ -104,7 +103,7 @@ async function handelRejectStore(req, res) {
                 new ApiResponse(404, {}, "Store not found")
             );
         }
-        
+
         if (store.isApproved === "rejected") {
             return res.status(400).json(
                 new ApiResponse(400, {}, "Store already Rejected")
@@ -136,4 +135,4 @@ async function handelRejectStore(req, res) {
 }
 
 
-export { handelStoreOpeningReq, handelApproveStore , handelRejectStore }
+export { handelStoreOpeningReq, handelApproveStore, handelRejectStore }

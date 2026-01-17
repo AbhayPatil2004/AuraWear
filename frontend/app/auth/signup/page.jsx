@@ -45,6 +45,7 @@ export default function SignupPage() {
                 setMessage(data.message);
                 setFormData({ username: "", email: "", password: "" });
 
+                 localStorage.setItem("user", JSON.stringify(data.data.user))
                 setTimeout(() => {
                     router.push("/auth/verifyemail"); // or "/verify-otp" or "/dashboard"
                 },1500)
