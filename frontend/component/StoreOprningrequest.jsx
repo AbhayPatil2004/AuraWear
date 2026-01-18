@@ -1,131 +1,140 @@
-"use client";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
-import { useEffect, useState } from "react";
 
-export default function StoreOpeningRequests() {
+const StoreRequests = () => {
+
+  const router = useRouter()
+
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Fetch pending stores
-  const fetchStores = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch("http://localhost:8000/admin/openingreq", {
-        credentials: "include",
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        setError(data.message || "Failed to fetch stores");
-        return;
-      }
-      setStores(data.data);
-    } catch (err) {
-      setError("Something went wrong");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchStores = async () => {
+      try {
+        console.log("Fetching stores...");
+
+        const res = await fetch(
+          "http://localhost:8000/admin/openingreq",
+          {
+            credentials: "include"
+          }
+        );
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! Status: ${res.status}`);
+        }
+
+        const json = await res.json();
+        console.log("API Response:", json);
+
+        setStores(json.data ?? []);
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setError("Failed to load store requests");
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchStores();
   }, []);
 
-  // Accept / Reject store
-  const handleAction = async (storeId, action) => {
-    try {
-      const res = await fetch(
-        `http://localhost:8000/store/${action}/${storeId}`,
-        { method: "PATCH", credentials: "include" }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        alert(data.message || "Action failed");
-        return;
-      }
-      // Remove store from UI after action
-      setStores((prev) => prev.filter((s) => s._id !== storeId));
-    } catch (err) {
-      alert("Something went wrong");
-    }
-  };
-
-  if (loading)
+  if (loading) {
     return (
-      <div className="text-gray-700 text-center mt-10 font-medium">
-        Loading requests...
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        Loading store requests...
       </div>
     );
-  if (error)
+  }
+
+  if (error) {
     return (
-      <div className="text-red-600 text-center mt-10 font-medium">{error}</div>
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        {error}
+      </div>
     );
+  }
+
+  if (!stores.length) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-gray-500">
+        No pending store requests
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-gray-50 min-h-screen p-8">
-      <h2 className="text-gray-900 text-3xl font-bold mb-8">
-        Store Opening Requests
-      </h2>
 
-      {stores.length === 0 ? (
-        <p className="text-gray-500 text-center">No pending requests</p>
-      ) : (
-        <div className="grid gap-6">
-          {stores.map((store) => (
-            <div
-              key={store._id}
-              className="bg-white rounded-xl shadow-md p-6 flex justify-between items-start transition-transform hover:scale-[1.01]"
-            >
-              {/* LEFT SIDE: Logo + Info */}
-              <div className="flex gap-4">
-                {/* Store Logo */}
-                <img
-                  src={store.logo || "/default-store.png"}
-                  alt={store.storeName}
-                  className="w-16 h-16 rounded-lg object-cover border border-gray-200"
-                />
+  <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 p-8">
+    <h1 className="text-3xl font-bold text-gray-900 mb-8 tracking-tight">
+      Pending Store Requests
+    </h1>
 
-                <div>
-                  <h3 className="text-gray-900 text-xl font-semibold">
-                    {store.storeName}
-                  </h3>
-
-                  {/* Owner */}
-                  <p className="text-gray-600 text-sm mt-1">
-                    Owner:{" "}
-                    <span className="text-gray-900 font-medium">
-                      {store.owner?.username || "Unknown"}
-                    </span>
-                  </p>
-
-                  {/* Products */}
-                  <p className="text-gray-500 text-sm mt-2">
-                    <span className="font-medium text-gray-700">Products:</span>{" "}
-                    {store.storeProducts.join(", ")}
-                  </p>
-                </div>
-              </div>
-
-              {/* ACTION BUTTONS */}
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={() => handleAction(store._id, "accept")}
-                  className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg shadow-md transition-colors"
-                >
-                  Accept
-                </button>
-
-                <button
-                  onClick={() => handleAction(store._id, "reject")}
-                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-medium rounded-lg shadow-md transition-colors"
-                >
-                  Reject
-                </button>
-              </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+      {stores.map((store) => (
+        <div
+          key={store.id}
+          className="group bg-white/80 backdrop-blur-md rounded-2xl border border-gray-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 overflow-hidden"
+        >
+          {/* Header */}
+          <div className="flex items-center gap-4 p-5 border-b bg-white">
+            <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 ring-1 ring-gray-200 group-hover:ring-indigo-300 transition">
+              <img
+                src={store.logo}
+                alt={store.storeName}
+                className="w-full h-full object-cover"
+              />
             </div>
-          ))}
+
+            <div className="flex-1">
+              <h2 className="text-lg font-semibold text-gray-900">
+                {store.storeName}
+              </h2>
+              <p className="text-sm text-gray-500">
+                Owned by{" "}
+                <span className="font-medium text-gray-700">
+                  {store.ownerName}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          {/* Products */}
+          <div className="p-5">
+            <h3 className="text-xs font-semibold text-gray-500 uppercase mb-3">
+              Products
+            </h3>
+
+            <div className="flex flex-wrap gap-2">
+              {store.products.map((product, index) => (
+                <span
+                  key={index}
+                  className="px-3 py-1 text-xs rounded-full bg-indigo-50 text-indigo-700 border border-indigo-100"
+                >
+                  {product}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* View Details */}
+          <div className="p-5 pt-0">
+            <button
+              onClick={() => router.push(`/admin/store/${store.id}`)}
+              className="w-full py-2.5 rounded-xl text-sm font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition"
+            >
+              View Store Details
+            </button>
+          </div>
         </div>
-      )}
+      ))}
     </div>
+  </div>
+
+
   );
-}
+};
+
+export default StoreRequests;

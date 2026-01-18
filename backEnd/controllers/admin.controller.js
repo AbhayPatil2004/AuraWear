@@ -8,9 +8,11 @@ import storeRejectedEmailBody from "../emailBody/storeReject.emailBody.js";
 async function handelStoreOpeningReq(req, res) {
   try {
     const stores = await Store.find({ isApproved: "pending" })
-      .populate("owner", "username avatar");
+      .select("storeName logo storeProducts owner") 
+      .populate("owner", "username");
 
     if (!stores.length) {
+        console.log("No pending store approval requests")
       return res.status(200).json(
         new ApiResponse(
           200,
@@ -20,10 +22,19 @@ async function handelStoreOpeningReq(req, res) {
       );
     }
 
+    const response = stores.map(store => ({
+      id: store._id,                 
+      storeName: store.storeName,
+      logo: store.logo,
+      products: store.storeProducts,
+      ownerName: store.owner.username,
+    }));
+        
+    console.log("Stores send Succesfully")
     return res.status(200).json(
       new ApiResponse(
         200,
-        stores,
+        response,
         "Pending stores fetched successfully"
       )
     );
@@ -41,11 +52,64 @@ async function handelStoreOpeningReq(req, res) {
   }
 }
 
+async function handelGetStoreDetails(req, res) {
+  try {
+    const { storeId } = req.params;
+
+    if (!storeId) {
+      return res.status(400).json(
+        new ApiResponse(
+          400,
+          {},
+          "Store ID is required"
+        )
+      );
+    }
+
+    const storeDetails = await Store.findById(storeId)
+      .select(
+        "storeName storeProducts description logo banner address owner"
+      )
+      .populate({
+        path: "owner",
+        select: "username email phone avatar"
+      });
+
+    if (!storeDetails) {
+      return res.status(404).json(
+        new ApiResponse(
+          404,
+          {},
+          "Store not found"
+        )
+      );
+    }
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        storeDetails,
+        "Store details fetched successfully"
+      )
+    );
+
+  } catch (error) {
+    console.error("Store details fetch error:", error);
+
+    return res.status(500).json(
+      new ApiResponse(
+        500,
+        {},
+        "Internal server error"
+      )
+    );
+  }
+}
 
 async function handelApproveStore(req, res) {
     try {
         const { storeId } = req.params;
-        // const storeId = "69611cad8c7df554b09ba502"
+       
 
         const store = await Store.findById(storeId)
             .populate("owner", "username email");
@@ -135,4 +199,4 @@ async function handelRejectStore(req, res) {
 }
 
 
-export { handelStoreOpeningReq, handelApproveStore, handelRejectStore }
+export { handelGetStoreDetails , handelStoreOpeningReq, handelApproveStore, handelRejectStore }
