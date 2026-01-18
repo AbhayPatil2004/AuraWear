@@ -10,7 +10,7 @@ router.get( "/openingreq" , handelUserAuthentication , handelUserAuthorization ,
 router.get("/:storeId" , handelUserAuthentication , handelUserAuthorization , handelGetStoreDetails )
 // router.post("/approvestore/:storeId" , handelUserAuthentication , handelUserAuthorization , handelApproveStore )
 // router.post("/rejectstore/:storeId" , handelUserAuthentication , handelUserAuthorization , handelApproveStore )
-router.patch("/accept" , handelUserAuthentication , handelUserAuthorization , handelApproveStore )
-router.patch("/reject" , handelUserAuthentication , handelUserAuthorization , handelRejectStore )
+router.patch("/accept/:storeId" , handelUserAuthentication , handelUserAuthorization , handelApproveStore )
+router.patch("/reject/:storeId" , handelUserAuthentication , handelUserAuthorization , handelRejectStore )
 
 export default router

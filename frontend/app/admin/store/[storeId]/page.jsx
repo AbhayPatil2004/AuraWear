@@ -46,17 +46,31 @@ const StoreDetailsPage = () => {
     const handleAction = async (type) => {
         try {
             setActionLoading(true);
-            const res = await fetch(
-                `http://localhost:8000/admin/store/${storeId}/${type}`,
-                {
-                    method: "POST",
-                }
-            );
+
+            let res;
+            if (type == "approve") {
+                res = await fetch(
+                    `http://localhost:8000/admin/accept/${storeId}`,
+                    {
+                        method: "PATCH",
+                        credentials : "include"
+                    }
+                );
+            }
+            else {
+                res = await fetch(
+                    `http://localhost:8000/admin/reject/${storeId}`,
+                    {
+                        method: "PATCH",
+                        credentials : "include"
+                    }
+                )
+            }
             const data = await res.json();
             if (data.statusCode !== 200) throw new Error(data.message);
 
             alert(`Store ${type}d successfully`);
-            router.push("/admin/openingreq"); // back to list
+            router.push("/profile"); // back to list
         } catch (err) {
             console.error(err);
             alert(err.message || "Action failed");
@@ -88,44 +102,41 @@ const StoreDetailsPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-100 p-8">
-            {/* Back Button */}
-            <button
-                onClick={() => router.back()}
-                className="mb-6 text-sm font-medium text-indigo-600 hover:underline"
-            >
-                ← Back
-            </button>
-
-            {/* Store Card */}
             <div className="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+
                 {/* Banner */}
-                <div className="h-56 bg-gray-200">
+                <div className="relative h-56 bg-gray-200">
                     <img
-                        src={store.banner || store.logo}
-                        alt={store.storeName}
+                        src={store.banner}
+                        alt={`${store.storeName} banner`}
                         className="w-full h-full object-cover"
                     />
+
+                    {/* Store Logo on Banner */}
+                    <div className="absolute -bottom-10 left-6 bg-white p-1 rounded-2xl shadow-md">
+                        <img
+                            src={store.logo}
+                            alt={`${store.storeName} logo`}
+                            className="w-24 h-24 rounded-2xl object-cover"
+                        />
+                    </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
-                    <div className="flex items-center gap-4 mb-6">
-                        <img
-                            src={store.owner.avatar || store.logo}
-                            className="w-20 h-20 rounded-xl object-cover"
-                        />
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">
-                                {store.storeName}
-                            </h1>
-                            <p className="text-gray-500 mt-1">
-                                Owner: {store.owner.username} | Email: {store.owner.email} | Phone: {store.owner.phone}
-                            </p>
-                        </div>
-                    </div>
+                <div className="p-6 pt-16">
+                    <h1 className="text-2xl font-bold text-gray-900">
+                        {store.storeName}
+                    </h1>
 
-                    <p className="text-gray-700 mb-6">{store.description}</p>
+                    <p className="text-gray-500 mt-2">
+                        Owner: {store.owner.username} | Email: {store.owner.email} | Phone: {store.owner.phone}
+                    </p>
 
+                    <p className="text-gray-700 mt-6 mb-6">
+                        {store.description}
+                    </p>
+
+                    {/* Products */}
                     <h3 className="text-sm font-semibold uppercase text-gray-500 mb-2">
                         Products
                     </h3>
@@ -140,11 +151,14 @@ const StoreDetailsPage = () => {
                         ))}
                     </div>
 
+                    {/* Address */}
                     <h3 className="text-sm font-semibold uppercase text-gray-500 mb-2">
                         Address
                     </h3>
                     <p className="text-gray-700 mb-6">
-                        {store.address.street}, {store.address.city}, {store.address.state}, {store.address.postalCode}, {store.address.country}
+                        {store.address.street}, {store.address.city},{" "}
+                        {store.address.state}, {store.address.postalCode},{" "}
+                        {store.address.country}
                     </p>
 
                     {/* Actions */}
