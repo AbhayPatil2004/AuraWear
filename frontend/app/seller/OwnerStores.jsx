@@ -21,7 +21,7 @@ export default function OwnerStoresPage() {
         async function fetchStores() {
             try {
                 const res = await fetch(
-                    `http://localhost:8000/store/my/${user._id}`,
+                    `http://localhost:8000/seller/owner/${user._id}`,
                     {
                         credentials: "include"
                     }
@@ -45,7 +45,7 @@ export default function OwnerStoresPage() {
     if (loading) return <p>Loading stores...</p>;
 
     return (
-        <div className="min-h-screen bg-white p-8">
+        <div className="min-h-screen bg-gray-50 p-8">
             <h1 className="mb-8 text-3xl font-bold text-gray-900">
                 My Stores
             </h1>
@@ -75,7 +75,7 @@ export default function OwnerStoresPage() {
 
                             {/* Action */}
                             <button
-                                onClick={() => router.push(`/store/${store._id}`)}
+                                onClick={() => router.push(`/seller/store/${store._id}`)}
                                 className="mt-auto w-full rounded-lg bg-blue-600 px-4 py-2 text-white font-medium transition hover:bg-blue-700"
                             >
                                 View Details →

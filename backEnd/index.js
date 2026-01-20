@@ -14,6 +14,8 @@ import productRouter from './routes/product.route.js'
 import cartRouter from './routes/cart.route.js'
 import reviewRouter from './routes/review.route.js'
 import orderRouter from './routes/order.route.js'
+import sellerRouter from './routes/seller.route.js'
+
 const app = express();
 
 app.use(cors({
@@ -29,6 +31,7 @@ app.use(cookieParser());
 app.use("/user", userRouter);
 app.use("/store" , storeRouter )
 app.use("/admin",adminRouter) 
+app.use("/seller" , sellerRouter )
 app.use("/product" , productRouter )
 app.use("/cart" , cartRouter )
 app.use("/review" , reviewRouter )

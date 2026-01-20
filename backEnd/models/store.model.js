@@ -58,9 +58,9 @@ const storeSchema = new mongoose.Schema(
       max: 5,
     },
 
-    totalReviews: {
-      type: Number,
-      default: 0,
+    reviews: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref : "StoreReview"
     },
 
     totalProducts: {
@@ -111,7 +111,42 @@ const storeSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-    
+
+    productSales: [
+      {
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "Product",
+          required: true,
+        },
+
+        productName: {
+          type: String,
+          required: true,
+        },
+
+        totalQuantitySold: {
+          type: Number,
+          default: 0,
+        },
+
+        totalRevenue: {
+          type: Number,
+          default: 0,
+        },
+
+        totalProfit: {
+          type: Number,
+          default: 0,
+        },
+
+        lastSoldAt: {
+          type: Date,
+        },
+      }
+    ],
+
+
   },
   {
     timestamps: true,

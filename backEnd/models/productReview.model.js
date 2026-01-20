@@ -52,5 +52,5 @@ const reviewSchema = new mongoose.Schema(
 
 reviewSchema.index({ user: 1, product: 1 }, { unique: true });
 
-const Review = mongoose.model("Review", reviewSchema);
-export default Review;
+const ProductReview = mongoose.model("ProductReview", reviewSchema);
+export default ProductReview;

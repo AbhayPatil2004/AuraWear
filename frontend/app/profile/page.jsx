@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import OwnerStoresPage from "../../component/OwnerStores"
-import StoreOpeningRequests from "../../component/StoreOprningrequest";
+import OwnerStoresPage from "../seller/OwnerStores.jsx"
+import StoreOpeningRequests from "../admin/StoreOprningrequest.jsx";
 
 export default function ProfilePage() {
 
@@ -21,12 +21,12 @@ export default function ProfilePage() {
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
-  const storedUser = localStorage.getItem("user");
-  if (storedUser) {
-    const parsedUser = JSON.parse(storedUser);
-    setRole(parsedUser?.role || null);
-  }
-}, []);
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+            const parsedUser = JSON.parse(storedUser);
+            setRole(parsedUser?.role || null);
+        }
+    }, []);
 
 
     // 🔹 Fetch profile
@@ -132,7 +132,7 @@ export default function ProfilePage() {
 
             <div className="text-black min-h-screen bg-gray-100 flex justify-center px-4 py-10">
                 <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
-
+                                    
                     {/* LOGOUT */}
                     <button
                         onClick={handleLogout}

@@ -1,5 +1,5 @@
 import Order from "../models/order.model.js";
-import Review from "../models/review.model.js";
+import Review from "../models/productReview.model.js";
 import ApiResponse from "../utils/ApiResponse.js";
 
 async function handelAddProdcutReview(req, res) {
