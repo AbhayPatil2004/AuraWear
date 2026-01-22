@@ -50,7 +50,7 @@ export default function StoreDashboardPage() {
                 <div>
                     {store.banner && (
                         <img src={store.banner} className="w-full h-40 sm:h-56 md:h-100 object-cover rounded-xl mb-6"
- />
+                        />
                     )}
 
                     <div className="flex items-center gap-6">
@@ -119,7 +119,8 @@ export default function StoreDashboardPage() {
                     {/* SUBSCRIBE / UPGRADE BUTTON */}
                     <button
                         onClick={() =>
-                            router.push(`/seller/store/${storeId}/subscription`)
+                            router.push(`/subscription/${storeId}`)
+
                         }
                         className={`mt-4 px-6 py-2 rounded-lg text-white
       ${store.isSubscriptionActive

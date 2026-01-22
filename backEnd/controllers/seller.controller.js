@@ -4,6 +4,8 @@ import ApiResponse from "../utils/ApiResponse.js";
 import sendMailToUser from "../utils/sendMail.js";
 import storeOpeningBody from "../emailBody/storeOpening.emailBody.js";
 import mongoose from "mongoose";
+import createOrder from "../utils/createOrder.js";
+
 
 async function handelGetStoreByIdForSeller(req, res) {
   try {
@@ -85,4 +87,96 @@ async function handelGetStoreByOwner(req, res) {
   }
 }
 
-export { handelGetStoreByIdForSeller , handelGetStoreByOwner }
+async function handelCreateStoreSubscriptionOrder(req, res) {
+
+  try {
+
+    const { amount } = req.body;
+
+    const allowedAmounts = [100, 250, 500, 1000];
+
+    if (!allowedAmounts.includes(amount)) {
+      return res.status(400).json(
+        new ApiResponse(400, null, "Invalid amount")
+      );
+    }
+
+    const order = await createOrder(amount);
+
+    return res.status(200).json(
+      new ApiResponse(200, order, "Order created successfully")
+    );
+
+  } catch (error) {
+    console.error("Upgrade Subscription Error:", error);
+    return res.status(500).json(
+      new ApiResponse(500, null, "Internal server error")
+    );
+  }
+}
+
+async function handelUpgradeStoreSubscription(req, res) {
+  try {
+    const { storeId } = req.params;
+    const { razorpay_payment_id, amount } = req.body;
+
+    if (!razorpay_payment_id) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Payment not successful"));
+    }
+
+    const store = await Store.findById(storeId);
+
+    if (!store) {
+      return res
+        .status(404)
+        .json(new ApiResponse(404, null, "Store not found"));
+    }
+
+    // 🔹 Subscription mapping
+    const subscriptionMap = {
+      100: { plan: "basic", months: 1 },
+      250: { plan: "pro", months: 3 },
+      500: { plan: "pro", months: 6 },
+      1000: { plan: "premium", months: 12 },
+    };
+
+    const selectedPlan = subscriptionMap[amount];
+
+    if (!selectedPlan) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Invalid subscription amount"));
+    }
+
+    const startDate = new Date();
+    const endDate = new Date(startDate);
+    endDate.setMonth(endDate.getMonth() + selectedPlan.months);
+
+    // 🔹 Update store subscription
+    store.subscriptionPlan = selectedPlan.plan;
+    store.subscriptionStartDate = startDate;
+    store.subscriptionEndDate = endDate;
+    store.isSubscriptionActive = true;
+    store.trialEndsAt = null;
+
+    await store.save();
+
+    return res.status(200).json(
+      new ApiResponse(200, {
+        plan: selectedPlan.plan,
+        startDate,
+        endDate,
+      }, "Subscription upgraded successfully")
+    );
+  } catch (error) {
+    console.error("Subscription upgrade error:", error);
+    return res.status(500).json(
+      new ApiResponse(500, null, "Internal server error")
+    );
+  }
+}
+
+
+export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription }
