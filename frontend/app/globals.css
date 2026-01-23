@@ -1,6 +1,23 @@
 @import "tailwindcss";
 
 /* Force white background globally */
+
+/* globals.css */
+/* globals.css */
+
+.label {
+  @apply block text-sm font-semibold text-gray-800 mb-1;
+}
+
+.input-modern {
+  @apply w-full rounded-xl border border-gray-300 px-4 py-3
+         text-gray-900 text-base
+         placeholder:text-gray-400
+         focus:outline-none focus:ring-2 focus:ring-black
+         transition;
+}
+
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

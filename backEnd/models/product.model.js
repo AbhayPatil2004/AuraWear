@@ -53,6 +53,7 @@ const productSchema = new mongoose.Schema(
             type: String,
             enum: ["men", "women", "unisex", "kids"],
             index: true,
+            default : "unisex"
         },
 
         isReturnable: {
@@ -81,6 +82,9 @@ const productSchema = new mongoose.Schema(
         images: {
             type: [String],
             validate: [arr => arr.length > 0, "At least one image required"],
+        },
+        video : {
+            type: [String],
         },
 
         tags: {
@@ -129,7 +133,7 @@ const productSchema = new mongoose.Schema(
 productSchema.pre("save", function (next) {
     this.finalPrice =
         this.price - (this.price * this.discountPercentage) / 100;
-    next();
+    
 });
 
 const Product = mongoose.model("Product", productSchema);

@@ -15,12 +15,19 @@ export async function POST(req) {
       );
     }
 
+    // 🔥 IMPORTANT
+    const mimeType = file.type; // image/png | video/mp4
+    const isVideo = mimeType.startsWith("video");
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const upload = await new Promise((resolve, reject) => {
+    const uploadResult = await new Promise((resolve, reject) => {
       cloudinary.uploader.upload_stream(
-        { folder: "AuraWear" },
+        {
+          folder: "AuraWear",
+          resource_type: isVideo ? "video" : "image", // 🔥 FIX
+        },
         (error, result) => {
           if (error) reject(error);
           else resolve(result);
@@ -28,11 +35,16 @@ export async function POST(req) {
       ).end(buffer);
     });
 
-    return NextResponse.json({ url: upload.secure_url });
+    return NextResponse.json({
+      url: uploadResult.secure_url,
+      type: isVideo ? "video" : "image",
+    });
 
   } catch (error) {
+    console.error("Cloudinary Upload Error:", error);
+
     return NextResponse.json(
-      { message: "Upload Failed" },
+      { message: error.message || "Upload Failed" },
       { status: 500 }
     );
   }

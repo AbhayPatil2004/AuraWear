@@ -5,36 +5,53 @@ import sendMailToUser from "../utils/sendMail.js";
 import storeOpeningBody from "../emailBody/storeOpening.emailBody.js";
 import mongoose from "mongoose";
 import createOrder from "../utils/createOrder.js";
+import Product from "../models/product.model.js";
 
-async function handelAddProductToStore( req , res ){
+async function handleAddProductToStore(req, res) {
+  try {
+    const { storeId } = req.params;
+    const {
+      title, description, category, price, discountPercentage,
+      gender, isReturnable, sizes, colors, tags,
+      searchKeyword, images, video, stock
+    } = req.body;
 
-  try{
-
-    const { storeId } = req.params ;
-    const { title , description , category , price , discountPercentage , gender , isReturnable , sizes , colors , tags , searchKeyword } = req.body 
-    
-    const store = await Store.findById(storeId)
-
-    if( !store ){
-      return res.status(400).json(
-        new ApiResponse( 500 , {} , "Store not found with this id")
-      )
+    const store = await Store.findById(storeId);
+    if (!store) {
+      return res.status(404).json(
+        new ApiResponse(404, {}, "Store not found")
+      );
     }
 
-    const { ownerId } = store.owner
+    const ownerId = store.owner;
 
+    const product = await Product.create({
+      store: storeId,
+      seller: ownerId,
+      title,
+      description,
+      category,
+      price,
+      discountPercentage,
+      gender,
+      isReturnable,
+      sizes,
+      colors,
+      tags,
+      searchKeyword,
+      images,
+      video,
+      stock
+    });
 
+    return res.status(201).json(
+      new ApiResponse(201, product, "Product added successfully")
+    );
 
-
-
-    
-
-
-  }
-  catch(error){
+  } catch (error) {
     console.error(error);
     return res.status(500).json(
-      new ApiResponse(500, {}, "Internal server error")
+      new ApiResponse(500, {}, error.message)
     );
   }
 }
@@ -97,7 +114,7 @@ async function handelGetStoreByOwner(req, res) {
 
     const stores = await Store.find({
       owner: ownerId,
-      isApproved: "accepted",
+
     })
       .select("storeName storeProducts logo banner");
 
@@ -233,4 +250,4 @@ async function handelUpgradeStoreSubscription(req, res) {
 }
 
 
-export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription }
+export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription , handleAddProductToStore }
