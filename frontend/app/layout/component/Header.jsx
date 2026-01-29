@@ -49,17 +49,9 @@ export default function Header() {
 
           {/* Actions */}
           <div className="flex items-center gap-6">
-            {role === "user" && (
-              <Link href="/cart" className="relative">
-                <ShoppingCart size={26} />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs px-2 py-0.5 rounded-full">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-            )}
-
+           <Link href="/cart" className="relative">
+      <ShoppingCart size={26} />
+    </Link>
             {/* Profile */}
             {/* <div className="relative">
               <button
@@ -98,7 +90,7 @@ export default function Header() {
               )}
             </div> */}
 
-            <ProfileIcon/>
+            <ProfileIcon />
           </div>
         </div>
       </header>
@@ -132,7 +124,7 @@ export default function Header() {
               <User size={24} />
             </Link> */}
 
-            <ProfileIcon/>
+            <ProfileIcon />
           </div>
         </div>
       </header>

@@ -30,17 +30,26 @@ export default function VerifyEmailOtpPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Invalid OTP");
-      } else {
-        setMessage(data.message || "Email verified successfully");
-        localStorage.setItem("user", JSON.stringify(data.data.user))
-        localStorage.setItem("hello", JSON.stringify("hello"))
+  setError(data.message || "Invalid OTP");
+} else {
+  setMessage(data.message || "Email verified successfully");
 
-        
-        setTimeout(() => {
-          router.push("/");
-        }, 1500);
-      }
+  // 7 days expiry for user
+  const now = new Date();
+  const item = {
+    value: data.data.user, // actual user object
+    expiry: now.getTime() + 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+  };
+  localStorage.setItem("user", JSON.stringify(item));
+
+  // Optional extra data
+  localStorage.setItem("hello", JSON.stringify("hello"));
+
+  setTimeout(() => {
+    router.push("/");
+  }, 1500);
+}
+
     } catch {
       setError("Something went wrong. Please try again.");
     } finally {

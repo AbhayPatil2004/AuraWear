@@ -28,10 +28,17 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      > <Header></Header>
-        {children}
-        <Footer></Footer>
+      >
+        <Header />
+        
+        {/* Push content below sticky header */}
+        <main className="pt-24 md:pt-24">
+          {children}
+        </main>
+        
+        <Footer />
       </body>
     </html>
   );
 }
+

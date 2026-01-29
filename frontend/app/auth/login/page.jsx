@@ -33,13 +33,19 @@ export default function LoginPage() {
       } else {
         setMessage(data.message || "Login successful");
 
-        localStorage.setItem("user", JSON.stringify(data.data.user))
-
+        // 7 days expiry
+        const now = new Date();
+        const item = {
+          value: data.data.user,
+          expiry: now.getTime() + 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+        };
+        localStorage.setItem("user", JSON.stringify(item));
 
         setTimeout(() => {
           router.push("/");
         }, 1500);
       }
+
     } catch (err) {
       setError("Something went wrong. Please try again.");
     } finally {
