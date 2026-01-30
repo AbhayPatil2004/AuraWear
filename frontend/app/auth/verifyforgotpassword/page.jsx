@@ -23,32 +23,32 @@ export default function VerifyEmailOtpPage() {
       const res = await fetch("http://localhost:8000/user/verifyforgotpassword", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email , otp }),
+        body: JSON.stringify({ email, otp }),
         credentials: "include",
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-  setError(data.message || "Invalid OTP");
-} else {
-  setMessage(data.message || "Email verified successfully");
+        setError(data.message || "Invalid OTP");
+      } else {
+        setMessage(data.message || "Email verified successfully");
 
-  // 7 days expiry for user
-  const now = new Date();
-  const item = {
-    value: data.data.user, // actual user object
-    expiry: now.getTime() + 7 * 24 * 60 * 60 * 1000, // 7 days in ms
-  };
-  localStorage.setItem("user", JSON.stringify(item));
+        // 7 days expiry for user
+        const now = new Date();
+        const item = {
+          value: data.data.user, // actual user object
+          expiry: now.getTime() + 7 * 24 * 60 * 60 * 1000, // 7 days in ms
+        };
+        localStorage.setItem("user", JSON.stringify(item));
 
-  // Optional extra data
-  localStorage.setItem("hello", JSON.stringify("hello"));
+        // Optional extra data
+        localStorage.setItem("hello", JSON.stringify("hello"));
 
-  setTimeout(() => {
-    router.push("/");
-  }, 1500);
-}
+        setTimeout(() => {
+          router.push("/");
+        }, 1500);
+      }
 
     } catch {
       setError("Something went wrong. Please try again.");
@@ -57,26 +57,26 @@ export default function VerifyEmailOtpPage() {
     }
   }
 
-  async function resendOtp(e){
+  async function resendOtp(e) {
 
     e.preventDefault()
-    try{
-      const res = await fetch("http://localhost:8000/user/resendotp" , {
-        method : "POST",
+    try {
+      const res = await fetch("http://localhost:8000/user/resendotp", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
       })
 
       const data = await res.json()
-      if( res.ok ){
-        
+      if (res.ok) {
+
         setMessage(data.message || "Otp Send Succesfully");
       }
-      else{
-        setError( data.message || "Something went wrong. Please try again.");
+      else {
+        setError(data.message || "Something went wrong. Please try again.");
       }
     }
-    catch(error){
+    catch (error) {
       setError("Something went wrong. Please try again.");
     }
   }
@@ -141,7 +141,7 @@ export default function VerifyEmailOtpPage() {
         {/* Footer */}
         <p className="text-center text-sm text-gray-500 mt-6">
           Didn’t receive OTP?{" "}
-          <span className="text-blue-600 hover:underline cursor-pointer "  onClick={ resendOtp }>
+          <span className="text-blue-600 hover:underline cursor-pointer " onClick={resendOtp}>
             Resend
           </span>
         </p>

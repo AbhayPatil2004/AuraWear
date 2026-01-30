@@ -129,7 +129,6 @@ const productSchema = new mongoose.Schema(
     { timestamps: true }
 );
 
-
 productSchema.pre("save", function (next) {
     this.finalPrice =
         this.price - (this.price * this.discountPercentage) / 100;

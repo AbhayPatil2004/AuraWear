@@ -45,7 +45,7 @@ export default function OwnerStoresPage() {
     if (loading) return <p>Loading stores...</p>;
 
     return (
-        <div className="min-h-screen bg-white p-8">
+        <div className="min-h-screen bg-gray-50 p-8">
             <h1 className="mb-8 text-3xl font-bold text-gray-900">
                 My Stores
             </h1>

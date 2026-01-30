@@ -46,8 +46,6 @@ function otpBody(username, otp) {
 </head>
 <body>
   <div class="container">
-    
-    
 
     <!-- Heading -->
     <div class="brand">AuraWear</div>

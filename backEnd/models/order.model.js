@@ -2,15 +2,14 @@ import mongoose from "mongoose";
 
 const orderSchema = new mongoose.Schema(
   {
-    // 👤 Buyer info
+    
     buyer: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true,
     },
-
-    // 📦 Products in the order (multi-seller)
+    
     items: [
       {
         product: {
@@ -33,18 +32,27 @@ const orderSchema = new mongoose.Schema(
           required: true,
           min: 1,
         },
+        color : {
+          type : String
+        },
+        size : {
+          type : String
+        },
+        gender : {
+          type : String ,
+          enum :[ "male" , "female" , "unisex"]
+        },
         price: {
           type: Number,
-          required: true, // price per unit
+          required: true, 
         },
         finalPrice: {
           type: Number,
-          required: true, // after discount
+          required: true, 
         },
       },
     ],
-
-    // 💰 Payment details
+   
     paymentMethod: {
       type: String,
       enum: ["COD", "Razorpay", "Wallet", "Other"],
@@ -59,8 +67,7 @@ const orderSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-
-    // 🏠 Shipping address (snapshot at order time)
+    
     shippingAddress: {
       fullName: { type: String, required: true },
       phone: { type: String, required: true },
@@ -70,8 +77,7 @@ const orderSchema = new mongoose.Schema(
       postalCode: { type: String, required: true },
       country: { type: String, default: "India" },
     },
-
-    // 🚦 Order status
+    
     status: {
       type: String,
       enum: [
@@ -86,8 +92,7 @@ const orderSchema = new mongoose.Schema(
       ],
       default: "pending",
     },
-
-    // ⚡ Extra info
+   
     trackingNumber: {
       type: String,
       default: "",

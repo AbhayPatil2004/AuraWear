@@ -109,7 +109,6 @@ async function handelGetStoreDetails(req, res) {
 async function handelApproveStore(req, res) {
     try {
         const { storeId } = req.params;
-       
 
         const store = await Store.findById(storeId)
             .populate("owner", "username email");
@@ -125,6 +124,7 @@ async function handelApproveStore(req, res) {
 
         store.isApproved = "accepted";
         store.trialEndsAt = trialEndsAt;
+        
         await store.save();
 
         const ownerId = store.owner._id;

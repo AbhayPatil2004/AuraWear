@@ -4,126 +4,84 @@ import { useState } from "react";
 import Link from "next/link";
 import {
   ShoppingCart,
-  User,
   Store,
-  ChevronDown,
   Home,
   Boxes,
   ShoppingBag,
   DollarSign,
 } from "lucide-react";
-import ProfileIcon from '../../profile/components/ProfileIcon.jsx'
+import ProfileIcon from "../../profile/components/ProfileIcon.jsx";
 
 export default function Header() {
-  const role = "user"; // "user" | "seller" | "admin"
+  const role = "user"; // user | seller | admin
   const cartCount = 3;
-
-  const [open, setOpen] = useState(false);
 
   return (
     <>
       {/* ================= DESKTOP HEADER ================= */}
-      <header className="hidden md:block sticky top-0 z-50 bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+      <header className="hidden md:block sticky top-0 z-50 bg-white/80 backdrop-blur border-b">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
 
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-2xl font-semibold tracking-wide"
+            className="flex items-center gap-2 text-xl font-semibold tracking-wider"
           >
-            <Store size={28} className="text-indigo-600" />
-            <span className="tracking-[0.2em] uppercase">Aurastore</span>
+            <div className="p-2 rounded-xl bg-indigo-600 text-white shadow">
+              <Store size={22} />
+            </div>
+            <span className="uppercase">Aurastore</span>
           </Link>
 
           {/* Nav */}
-          <nav className="flex items-center gap-10 font-medium text-lg">
-            <Link href="/">Home</Link>
-            <Link href="/products">Products</Link>
-            <Link href="/stores">Stores</Link>
+          <nav className="flex items-center gap-10 text-gray-700">
+            <Link className="hover:text-indigo-600 transition" href="/">Home</Link>
+            <Link className="hover:text-indigo-600 transition" href="/products">Products</Link>
+            <Link className="hover:text-indigo-600 transition" href="/stores">Stores</Link>
             {role !== "admin" && (
-              <Link href="/sell" className="text-indigo-600 font-semibold">
+              <Link
+                href="/sell"
+                className="px-4 py-2 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 transition"
+              >
                 Sell on Aurastore
               </Link>
             )}
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-6">
-           <Link href="/cart" className="relative">
-      <ShoppingCart size={26} />
-    </Link>
-            {/* Profile */}
-            {/* <div className="relative">
-              <button
-                onClick={() => setOpen(!open)}
-                className="flex items-center gap-2"
-              >
-                <User size={28} />
-                <ChevronDown size={18} />
-              </button>
-
-              {open && (
-                <div className="absolute right-0 mt-4 w-52 bg-white border rounded-xl shadow-lg overflow-hidden">
-                  {role === "user" && (
-                    <Link href="/orders" className="block px-5 py-3 hover:bg-gray-100">
-                      My Orders
-                    </Link>
-                  )}
-
-                  {role !== "user" && (
-                    <Link
-                      href={`/${role}/dashboard`}
-                      className="block px-5 py-3 hover:bg-gray-100"
-                    >
-                      Dashboard
-                    </Link>
-                  )}
-
-                  <Link href="/profile" className="block px-5 py-3 hover:bg-gray-100">
-                    Profile
-                  </Link>
-
-                  <button className="w-full text-left px-5 py-3 text-red-600 hover:bg-gray-100">
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div> */}
-
+          <div className="flex items-center gap-5">
+            <Link href="/cart" className="relative">
+              <ShoppingCart size={24} />
+              {/* {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 h-5 w-5 rounded-full bg-indigo-600 text-white text-xs flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )} */}
+            </Link>
             <ProfileIcon />
           </div>
         </div>
       </header>
 
       {/* ================= MOBILE TOP HEADER ================= */}
-      <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white border-b">
-        <div className="h-16 px-4 flex items-center justify-between">
-
-          {/* Logo */}
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-lg font-semibold tracking-widest"
-          >
-            <Store size={22} className="text-indigo-600" />
-            <span>Aurastore</span>
+      <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur border-b">
+        <div className="h-14 px-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2 font-semibold">
+            <div className="p-1.5 rounded-lg bg-indigo-600 text-white">
+              <Store size={18} />
+            </div>
+            Aurastore
           </Link>
 
-          {/* Actions */}
           <div className="flex items-center gap-4">
-            {role === "user" && (
-              <Link href="/cart" className="relative">
-                <ShoppingCart size={24} />
-                {cartCount > 0 && (
-                  <span className="absolute -top-2 -right-2 bg-indigo-600 text-white text-xs px-1.5 rounded-full">
-                    {cartCount}
-                  </span>
-                )}
-              </Link>
-            )}
-            {/* <Link href="/profile">
-              <User size={24} />
-            </Link> */}
-
+            <Link href="/cart" className="relative">
+              <ShoppingCart size={22} />
+              {/* {cartCount > 0 && (
+                <span className="absolute -top-2 -right-2 h-4 w-4 rounded-full bg-indigo-600 text-white text-[10px] flex items-center justify-center">
+                  {cartCount}
+                </span>
+              )} */}
+            </Link>
             <ProfileIcon />
           </div>
         </div>
@@ -131,35 +89,30 @@ export default function Header() {
 
       {/* ================= MOBILE BOTTOM NAV ================= */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t">
-        <div className="flex justify-around items-center h-16 text-xs font-medium">
-
-          <Link href="/" className="flex flex-col items-center gap-1">
+        <div className="flex justify-around items-center h-16 text-[11px] text-gray-600">
+          <Link href="/" className="flex flex-col items-center gap-1 hover:text-indigo-600">
             <Home size={20} />
             Home
           </Link>
-
-          <Link href="/products" className="flex flex-col items-center gap-1">
+          <Link href="/products" className="flex flex-col items-center gap-1 hover:text-indigo-600">
             <Boxes size={20} />
             Products
           </Link>
-
-          <Link href="/stores" className="flex flex-col items-center gap-1">
+          <Link href="/stores" className="flex flex-col items-center gap-1 hover:text-indigo-600">
             <ShoppingBag size={20} />
             Stores
           </Link>
-
           {role !== "admin" && (
-            <Link href="/sell" className="flex flex-col items-center gap-1 text-indigo-600">
+            <Link
+              href="/sell"
+              className="flex flex-col items-center gap-1 text-indigo-600"
+            >
               <DollarSign size={20} />
-              Sell on AuraStore
+              Sell
             </Link>
           )}
         </div>
       </nav>
-
-      {/* Spacer for mobile headers */}
-      {/* <div className="md:hidden h-16" />
-      <div className="md:hidden h-16" /> */}
     </>
   );
 }

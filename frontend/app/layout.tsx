@@ -32,7 +32,7 @@ export default function RootLayout({
         <Header />
         
         {/* Push content below sticky header */}
-        <main className="pt-24 md:pt-24">
+        <main >
           {children}
         </main>
         

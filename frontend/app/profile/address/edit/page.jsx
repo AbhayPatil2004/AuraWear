@@ -61,7 +61,6 @@ export default function UpdateAddressPage() {
                 body: JSON.stringify(address),
             });
 
-
             router.push("/profile");
         } catch (err) {
             console.error("Address update failed", err);

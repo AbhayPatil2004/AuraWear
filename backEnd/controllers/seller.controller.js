@@ -8,13 +8,28 @@ import createOrder from "../utils/createOrder.js";
 import Product from "../models/product.model.js";
 
 async function handleAddProductToStore(req, res) {
+  
   try {
     const { storeId } = req.params;
     const {
       title, description, category, price, discountPercentage,
       gender, isReturnable, sizes, colors, tags,
-      searchKeyword, images, video, stock
+      searchKeyword, images, video, stock, deliveryTime
     } = req.body;
+
+    if (
+      !title ||
+      !description ||
+      !category ||
+      price === undefined ||
+      stock === undefined ||
+      !Array.isArray(images) ||
+      images.length === 0
+    ) {
+      return res.status(400).json(
+        new ApiResponse(400, {}, "Some fields are missing or invalid")
+      );
+    }
 
     const store = await Store.findById(storeId);
     if (!store) {
@@ -23,11 +38,9 @@ async function handleAddProductToStore(req, res) {
       );
     }
 
-    const ownerId = store.owner;
-
     const product = await Product.create({
       store: storeId,
-      seller: ownerId,
+      seller: store.owner,
       title,
       description,
       category,
@@ -41,11 +54,15 @@ async function handleAddProductToStore(req, res) {
       searchKeyword,
       images,
       video,
-      stock
+      stock,
+      deliveryTime
     });
 
     return res.status(201).json(
-      new ApiResponse(201, product, "Product added successfully")
+      new ApiResponse(201, {
+        productId: product._id,
+        finalPrice: product.finalPrice
+      }, "Product added successfully")
     );
 
   } catch (error) {
@@ -55,8 +72,6 @@ async function handleAddProductToStore(req, res) {
     );
   }
 }
-
-
 
 async function handelGetStoreByIdForSeller(req, res) {
   try {
@@ -250,4 +265,4 @@ async function handelUpgradeStoreSubscription(req, res) {
 }
 
 
-export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription , handleAddProductToStore }
+export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription, handleAddProductToStore }

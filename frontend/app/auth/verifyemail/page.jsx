@@ -9,7 +9,6 @@ export default function VerifyEmailOtpPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-
   const router = useRouter();
 
   async function handleSubmit(e) {

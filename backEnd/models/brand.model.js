@@ -18,7 +18,7 @@ const brandSchema = new mongoose.Schema(
     },
 
     logo: {
-      type: String, // Cloudinary URL
+      type: String, 
     },
 
     country: {
@@ -33,7 +33,7 @@ const brandSchema = new mongoose.Schema(
 
     totalProducts: {
       type: Number,
-      default: 0, // increment when a product is added
+      default: 0, 
     },
   },
   { timestamps: true }

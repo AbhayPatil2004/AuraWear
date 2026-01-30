@@ -81,7 +81,7 @@ const storeSchema = new mongoose.Schema(
 
     isActive: {
       type: Boolean,
-      default: false,
+      default: true,
     },
 
     subscriptionPlan: {
