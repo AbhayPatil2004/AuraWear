@@ -20,13 +20,29 @@ export default function ProfilePage() {
 
     const [uploading, setUploading] = useState(false);
 
+    // useEffect(() => {
+    //     const storedUser = localStorage.getItem("user");
+    //     if (storedUser) {
+    //         const parsedUser = JSON.parse(storedUser);
+    //         setRole(parsedUser?.role || null);
+    //     }
+    // }, []);
+
     useEffect(() => {
         const storedUser = localStorage.getItem("user");
-        if (storedUser) {
-            const parsedUser = JSON.parse(storedUser);
-            setRole(parsedUser?.role || null);
+        if (!storedUser) return;
+
+        try {
+            const parsed = JSON.parse(storedUser);
+
+            // 👇 yahi main fix hai
+            // setUser(parsed.value);
+            setRole(parsed.value.role)
+        } catch {
+            localStorage.removeItem("user");
         }
     }, []);
+
 
 
     // 🔹 Fetch profile
@@ -72,7 +88,7 @@ export default function ProfilePage() {
             const uploadRes = await fetch("/api/upload", {
                 method: "POST",
                 body: formData,
-                
+
             });
 
             const uploadData = await uploadRes.json();
@@ -133,7 +149,7 @@ export default function ProfilePage() {
 
             <div className="text-black min-h-screen bg-gray-100 flex justify-center px-4 py-10">
                 <div className="relative w-full max-w-4xl bg-white rounded-2xl shadow-lg overflow-hidden">
-                                    
+
                     {/* LOGOUT */}
                     <button
                         onClick={handleLogout}

@@ -9,16 +9,19 @@ export default function ProfileIcon() {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
+  const storedUser = localStorage.getItem("user");
+  if (!storedUser) return;
 
-    if (!storedUser) return;
+  try {
+    const parsed = JSON.parse(storedUser);
 
-    try {
-      setUser(JSON.parse(storedUser));
-    } catch {
-      localStorage.removeItem("user");
-    }
-  }, []);
+    // 👇 yahi main fix hai
+    setUser(parsed.value);
+  } catch {
+    localStorage.removeItem("user");
+  }
+}, []);
+
 
   // If user clicks avatar but not logged in
   const handleAvatarClick = () => {
@@ -91,6 +94,7 @@ export default function ProfileIcon() {
               <>
                 <MenuItem label="My Orders" />
                 <MenuItem label="My Wishlist" />
+                <MenuItem label="Open Store" />
               </>
             )}
 
@@ -98,11 +102,17 @@ export default function ProfileIcon() {
               <>
                 <MenuItem label="Seller Dashboard" />
                 <MenuItem label="My Stores" />
+                <MenuItem label="User compailents" />
+                <MenuItem label="Open Store" />
               </>
             )}
 
             {user.role === "admin" && (
+              <>
+
               <MenuItem label="Admin Dashboard" />
+              <MenuItem label="User compailents" />
+              </>
             )}
 
             <MenuItem
