@@ -7,6 +7,8 @@ import sendMailToUser from "../utils/sendMail.js";
 import storeApprovedEmailBody from "../emailBody/storeApproves.emailBody.js";
 import storeRejectedEmailBody from "../emailBody/storeReject.emailBody.js";
 
+import mongoose from "mongoose";
+
 async function handelGetUsers(req, res) {
   try {
     const users = await User.find()
@@ -29,7 +31,88 @@ async function handelGetUsers(req, res) {
     );
   }
 }
+ 
+async function handelBanUser(req, res) {
+  try {
+    const { id } = req.params;
 
+    // ✅ Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json(
+        new ApiResponse(400, {}, "Invalid user ID")
+      );
+    }
+
+    // ✅ Prevent banning admin
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json(
+        new ApiResponse(404, {}, "User not found")
+      );
+    }
+
+    if (user.role === "admin") {
+      return res.status(403).json(
+        new ApiResponse(403, {}, "Admin cannot be banned")
+      );
+    }
+
+    if (user.isBlocked) {
+      return res.status(400).json(
+        new ApiResponse(400, {}, "User is already banned")
+      );
+    }
+
+    user.isBlocked = true;
+    await user.save();
+
+    return res.status(200).json(
+      new ApiResponse(200, { user }, "User banned successfully")
+    );
+  } catch (error) {
+    console.error("Ban user error:", error);
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Internal Server Error")
+    );
+  }
+}
+
+async function handelUnBanUser(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json(
+        new ApiResponse(400, {}, "Invalid user ID")
+      );
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json(
+        new ApiResponse(404, {}, "User not found")
+      );
+    }
+
+    if (!user.isBlocked) {
+      return res.status(400).json(
+        new ApiResponse(400, {}, "User is not banned")
+      );
+    }
+
+    user.isBlocked = false;
+    await user.save();
+
+    return res.status(200).json(
+      new ApiResponse(200, { user }, "User unbanned successfully")
+    );
+  } catch (error) {
+    console.error("Unban user error:", error);
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Internal Server Error")
+    );
+  }
+}
 
 async function handelStoreOpeningReq(req, res) {
   try {
@@ -272,4 +355,4 @@ async function handelGetAllUserSellerProductsCount(req, res) {
 }
 
 
-export { handelGetStoreDetails, handelStoreOpeningReq, handelApproveStore, handelRejectStore, handelGetAllUserSellerProductsCount , handelGetUsers }
+export { handelGetStoreDetails, handelStoreOpeningReq, handelApproveStore, handelRejectStore, handelGetAllUserSellerProductsCount, handelGetUsers , handelBanUser , handelUnBanUser }

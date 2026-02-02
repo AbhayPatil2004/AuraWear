@@ -8,7 +8,9 @@ import {
   handelApproveStore,
   handelRejectStore,
   handelGetAllUserSellerProductsCount,
-  handelGetUsers
+  handelGetUsers , 
+  handelBanUser ,
+  handelUnBanUser
 } from "../controllers/admin.controller.js";
 
 const router = express.Router();
@@ -52,12 +54,28 @@ router.patch(
   handelRejectStore
 );
 
-/* ================== STORE DETAILS (ALWAYS LAST) ================== */
+
 router.get(
   "/store/:storeId",   // 👈 IMPORTANT CHANGE
   handelUserAuthentication,
   handelUserAuthorization,
   handelGetStoreDetails
 );
+
+// USERS
+router.patch(
+  "/users/ban/:id",
+  handelUserAuthentication,
+  handelUserAuthorization,
+  handelBanUser
+);
+
+router.patch(
+  "/users/unban/:id",
+  handelUserAuthentication,
+  handelUserAuthorization,
+  handelUnBanUser
+);
+
 
 export default router;

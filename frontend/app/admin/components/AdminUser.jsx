@@ -76,32 +76,42 @@ const AdminUsersPage = () => {
   );
 
   /* ================= BLOCK / UNBLOCK ================= */
-  const toggleBlock = async (user) => {
-    try {
-      setActionLoading(true);
+  /* ================= BAN / UNBAN USER ================= */
+const toggleBlock = async (user) => {
+  try {
+    setActionLoading(true);
 
-      const res = await fetch(
-        `http://localhost:8000/admin/users/${user._id}/block`,
-        {
-          method: "PATCH",
-          credentials: "include",
-        }
+    const endpoint = user.isBlocked
+      ? `http://localhost:8000/admin/users/unban/${user._id}`
+      : `http://localhost:8000/admin/users/ban/${user._id}`;
+
+    const res = await fetch(endpoint, {
+      method: "PATCH",
+      credentials: "include",
+    });
+
+    const data = await res.json();
+
+    if (data.statusCode === 200) {
+      // Optimistic update (no full refetch needed)
+      setAllUsers((prev) =>
+        prev.map((u) =>
+          u._id === user._id
+            ? { ...u, isBlocked: !user.isBlocked }
+            : u
+        )
       );
-
-      const data = await res.json();
-
-      if (data.statusCode === 200) {
-        fetchUsers();
-      } else {
-        alert(data.message || "Action failed");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Server error");
-    } finally {
-      setActionLoading(false);
+    } else {
+      alert(data.message || "Action failed");
     }
-  };
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  } finally {
+    setActionLoading(false);
+  }
+};
+
 
   /* ================= UI ================= */
   if (loading) {
