@@ -6,6 +6,93 @@ import storeOpeningBody from "../emailBody/storeOpening.emailBody.js";
 import mongoose from "mongoose";
 import createOrder from "../utils/createOrder.js";
 import Product from "../models/product.model.js";
+// import Store from '../models/store.model.js'
+
+
+async function handelSellerStats(req, res) {
+  try {
+
+    console.log("Seller Stats ")
+    const sellerId = req.user._id;
+
+    // 1️⃣ Total stores
+    const totalStores = await Store.countDocuments({
+      owner: sellerId,
+    });
+
+    // 2️⃣ Active stores
+    const activeStores = await Store.countDocuments({
+      owner: sellerId,
+      isActive: true,
+      isApproved: "accepted",
+    });
+
+    // 3️⃣ Aggregate store-level stats
+    const aggregateStats = await Store.aggregate([
+      {
+        $match: { owner: sellerId },
+      },
+      {
+        $group: {
+          _id: null,
+          totalProducts: { $sum: "$totalProducts" },
+          totalOrders: { $sum: "$totalOrders" },
+          avgRating: { $avg: "$rating" },
+        },
+      },
+    ]);
+
+    const totalProducts =
+      aggregateStats.length > 0 ? aggregateStats[0].totalProducts : 0;
+
+    const totalOrders =
+      aggregateStats.length > 0 ? aggregateStats[0].totalOrders : 0;
+
+    const avgRating =
+      aggregateStats.length > 0 && aggregateStats[0].avgRating
+        ? Number(aggregateStats[0].avgRating.toFixed(1))
+        : 0;
+
+    // 4️⃣ Total reviews (optional but good)
+    const reviewCountAgg = await Store.aggregate([
+      { $match: { owner: sellerId } },
+      {
+        $lookup: {
+          from: "storereviews",
+          localField: "reviews",
+          foreignField: "_id",
+          as: "reviewsData",
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalReviews: { $sum: { $size: "$reviewsData" } },
+        },
+      },
+    ]);
+
+    const totalReviews =
+      reviewCountAgg.length > 0 ? reviewCountAgg[0].totalReviews : 0;
+
+    // ✅ Final response
+    return res.status(200).json(
+      new ApiResponse(200, {
+        totalStores,
+        activeStores,
+        totalProducts,
+        completedOrders: totalOrders,
+        avgRating,
+        totalReviews,
+      }, "Seller stats fetched successfully")
+    );
+  } catch (error) {
+    console.error("Seller stats error:", error);
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Internal Server Error")
+    );
+  }
+}
 
 async function handleAddProductToStore(req, res) {
   
@@ -265,4 +352,4 @@ async function handelUpgradeStoreSubscription(req, res) {
 }
 
 
-export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription, handleAddProductToStore }
+export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription, handleAddProductToStore , handelSellerStats }

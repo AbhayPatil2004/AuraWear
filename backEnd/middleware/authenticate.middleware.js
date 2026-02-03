@@ -2,6 +2,9 @@ import ApiResponse from "../utils/ApiResponse.js";
 import jwt from 'jsonwebtoken'
 
 function handelUserAuthentication(req, res, next) {
+
+  console.log("request come for user authenication")
+
   try {
     const token =
       req.cookies?.token  ||

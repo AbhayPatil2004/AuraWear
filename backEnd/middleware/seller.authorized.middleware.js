@@ -3,6 +3,8 @@ import ApiResponse from "../utils/ApiResponse.js";
 async function handelUserAuthorization(req, res , next) {
     try {
 
+        console.log("request Come for Seller authorization")
+
         const role = req.user.role;
 
         if (role != "seller") {

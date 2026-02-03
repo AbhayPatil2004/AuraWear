@@ -1,9 +1,18 @@
 import SellerHeader from "../components/SellerHeader"
+import SellerStats from "../components/SellerStats"
+// import SellerStores from '../components/OwnerStores'
+// import OwnerStoresPage from "../components/SellerStores"
+import SellerStores from "../components/SellerStores"
 
-function Page(){
+function Page() {
 
     return (
-        <SellerHeader></SellerHeader>
+        <div>
+            <SellerHeader></SellerHeader>
+            <SellerStats></SellerStats>
+            {/* <OwnerStoresPage></OwnerStoresPage> */}
+            <SellerStores></SellerStores>
+        </div>
     )
 }
 
