@@ -95,7 +95,6 @@ async function handelSellerStats(req, res) {
 }
 
 async function handleAddProductToStore(req, res) {
-  
   try {
     const { storeId } = req.params;
     const {
@@ -145,11 +144,20 @@ async function handleAddProductToStore(req, res) {
       deliveryTime
     });
 
+    // 🔥 increment totalProducts
+    await Store.findByIdAndUpdate(storeId, {
+      $inc: { totalProducts: 1 }
+    });
+
     return res.status(201).json(
-      new ApiResponse(201, {
-        productId: product._id,
-        finalPrice: product.finalPrice
-      }, "Product added successfully")
+      new ApiResponse(
+        201,
+        {
+          productId: product._id,
+          finalPrice: product.finalPrice
+        },
+        "Product added successfully"
+      )
     );
 
   } catch (error) {
@@ -159,6 +167,7 @@ async function handleAddProductToStore(req, res) {
     );
   }
 }
+
 
 async function handelGetStoreByIdForSeller(req, res) {
   try {
