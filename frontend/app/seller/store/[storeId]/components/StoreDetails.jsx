@@ -3,9 +3,11 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
+import { Pencil } from "lucide-react";
+
 export default function StoreDashboardPage() {
     const { storeId } = useParams();
-    const router = useRouter();
+    const router = useRouter()
 
     const [store, setStore] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -23,6 +25,7 @@ export default function StoreDashboardPage() {
                 if (!res.ok) throw new Error("Fetch failed");
 
                 const data = await res.json();
+                console.log(data)
                 setStore(data.data);
             } catch (err) {
                 console.error(err);
@@ -33,6 +36,13 @@ export default function StoreDashboardPage() {
 
         fetchStore();
     }, [storeId]);
+
+    const handleEditLogo = () => console.log("Edit Logo");
+    const handleEditBanner = () => console.log("Edit Banner");
+    const handleEditName = () => console.log("Edit Store Name");
+    const handleEditProducts = () => console.log("Edit Products");
+    const handleEditAddress = () => console.log("Edit Address");
+
 
     if (loading) {
         return <div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>;
@@ -49,43 +59,85 @@ export default function StoreDashboardPage() {
                 {/* STORE HEADER */}
                 <div>
                     {store.banner && (
-                        <img src={store.banner} className="w-full h-40 sm:h-56 md:h-100 object-cover rounded-xl mb-6"
-                        />
+                        <div className="relative">
+                            <img
+                                src={store.banner}
+                                className="w-full h-40 sm:h-56 md:h-100 object-cover rounded-xl mb-6"
+                            />
+
+                            <button
+                                onClick={handleEditBanner}
+                                className="absolute top-3 right-3 bg-white p-2 rounded-full shadow"
+                            >
+                                <Pencil size={18} />
+                            </button>
+                        </div>
                     )}
 
+
                     <div className="flex items-center gap-6">
-                        <img
-                            src={store.logo || "/vercel.svg"}
-                            className="w-24 h-24 rounded-xl border object-cover"
-                        />
+                        <div className="relative">
+                            <img
+                                src={store.logo || "/vercel.svg"}
+                                className="w-24 h-24 rounded-xl border object-cover"
+                            />
+                            <button
+                                onClick={handleEditLogo}
+                                className="absolute -top-2 -right-2 bg-white p-1 rounded-full shadow"
+                            >
+                                <Pencil size={16} />
+                            </button>
+                        </div>
 
                         <div>
-                            <h1 className="text-3xl font-bold">{store.storeName}</h1>
+                            <div className="flex items-center gap-2">
+                                <h1 className="text-3xl font-bold">{store.storeName}</h1>
+                                <button onClick={handleEditName}>
+                                    <Pencil size={18} />
+                                </button>
+                            </div>
                             <p className="text-gray-500">{store.description}</p>
-                            <p className="text-sm mt-1">⭐ {store.rating} rating</p>
                         </div>
                     </div>
+
                 </div>
 
                 {/* ADDRESS */}
                 <Section title="Store Address">
-                    <p>
-                        {store.address?.street}, {store.address?.city},
-                        {store.address?.state} - {store.address?.postalCode}
-                    </p>
-                    <p>{store.address?.country}</p>
-                </Section>
+                    <div className="flex justify-between">
+                        <div>
+                            <p>
+                                {store.address?.street}, {store.address?.city},
+                                {store.address?.state} - {store.address?.postalCode}
+                            </p>
+                            <p>{store.address?.country}</p>
+                        </div>
 
-                {/* STORE PRODUCTS */}
-                <Section title="Store Products">
-                    <div className="flex flex-wrap gap-3">
-                        {store.storeProducts?.map((p, i) => (
-                            <span key={i} className="px-3 py-1 border rounded-full text-sm">
-                                {p}
-                            </span>
-                        ))}
+                        <button onClick={handleEditAddress}>
+                            <Pencil size={18} />
+                        </button>
                     </div>
                 </Section>
+
+
+                {/* STORE PRODUCTS */}
+               <Section title="Store Products">
+  <div className="flex justify-between mb-3">
+    <div></div>
+    <button onClick={handleEditProducts}>
+      <Pencil size={18} />
+    </button>
+  </div>
+
+  <div className="flex flex-wrap gap-3">
+    {store.storeProducts?.map((p, i) => (
+      <span key={i} className="px-3 py-1 border rounded-full text-sm">
+        {p}
+      </span>
+    ))}
+  </div>
+</Section>
+
 
                 {/* STATS */}
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
@@ -186,6 +238,7 @@ export default function StoreDashboardPage() {
     );
 }
 
+
 /* helpers */
 function InfoCard({ label, value }) {
     return (
@@ -206,6 +259,7 @@ function Section({ title, children }) {
         </section>
     );
 }
+
 
 function formatDate(date) {
     if (!date) return "—";
