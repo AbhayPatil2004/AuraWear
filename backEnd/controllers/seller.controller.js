@@ -360,5 +360,63 @@ async function handelUpgradeStoreSubscription(req, res) {
   }
 }
 
+async function handleUpdateStoreDetails(req, res) {
+  try {
+    const { storeId } = req.params;
+    const {
+      storeName,
+      storeProducts,
+      description,
+      logo,
+      banner,
+      address
+    } = req.body;
 
-export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription, handleAddProductToStore , handelSellerStats }
+    if (!mongoose.Types.ObjectId.isValid(storeId)) {
+      return res.status(400).json(
+        new ApiResponse(400, {}, "Invalid Store Id")
+      );
+    }
+
+    const store = await Store.findById(storeId);
+    if (!store) {
+      return res.status(404).json(
+        new ApiResponse(404, {}, "Store not found")
+      );
+    }
+
+    // update only provided fields
+    if (storeName && storeName.trim() !== "") {
+      store.storeName = storeName;
+    }
+
+    if (storeProducts) store.storeProducts = storeProducts;
+    if (description) store.description = description;
+
+    // logo & banner URLs
+    if (logo) store.logo = logo;
+    if (banner) store.banner = banner;
+
+    if (address) {
+      store.address = {
+        ...store.address,
+        ...address
+      };
+    }
+
+    await store.save();
+
+    return res.status(200).json(
+      new ApiResponse(200, store, "Store details updated successfully")
+    );
+
+  } catch (error) {
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Internal Server Error")
+    );
+  }
+}
+
+
+
+export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription, handleAddProductToStore, handelSellerStats , handleUpdateStoreDetails }

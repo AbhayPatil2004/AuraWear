@@ -1,7 +1,11 @@
 "use client";
 
-import { useState , useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+// import { useRouter } from "next/navigation";
+
+import { useRouter, useParams } from "next/navigation";
+import toast from "react-hot-toast";
+
 
 export default function CreateStorePage() {
   const router = useRouter();
@@ -18,11 +22,13 @@ export default function CreateStorePage() {
       country: "India",
     },
   });
+  // const router = useRouter();
+  const { storeId } = useParams();
 
   const [logo, setLogo] = useState(null);
   const [banner, setBanner] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
+
 
   function handleChange(e) {
     const { name, value } = e.target;
@@ -53,49 +59,48 @@ export default function CreateStorePage() {
   }
 
   async function handleSubmit(e) {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      let logoUrl = "";
-      let bannerUrl = "";
+  try {
+    let logoUrl = "";
+    let bannerUrl = "";
 
-      if (logo) logoUrl = await uploadImage(logo);
-      if (banner) bannerUrl = await uploadImage(banner);
+    // upload images first
+    if (logo) logoUrl = await uploadImage(logo);
+    if (banner) bannerUrl = await uploadImage(banner);
 
-      const payload = {
-        storeName: formData.storeName,
-        description: formData.description,
-        storeProducts: formData.storeProducts.split(","),
-        address: formData.address,
-        logoUrl,
-        bannerUrl,
-      };
+    const payload = {
+      storeName: formData.storeName,
+      description: formData.description,
+      storeProducts: formData.storeProducts.split(","),
+      address: formData.address,
+      logo: logoUrl,
+      banner: bannerUrl
+    };
 
-      const res = await fetch("http://localhost:8000/store/create", {
-        method: "POST",
+    const res = await fetch(
+      `http://localhost:8000/seller/store/${storeId}`,
+      {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify(payload),
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        if (data.message === "Unauthorized: Please login first") {
-          router.push("/auth/signup");
-          return;
-        }
-        throw new Error(data.message || "Store creation failed");
       }
+    );
 
-      setSuccess(true); // 🎉 show popup
-    } catch (error) {
-      alert(error.message);
-    } finally {
-      setLoading(false);
-    }
+    if (!res.ok) throw new Error("Update failed");
+
+    toast.success("Store updated successfully");
+
+    router.push(`/seller/dashboard/store/${storeId}`);
+  } catch (err) {
+    toast.error(err.message);
+  } finally {
+    setLoading(false);
   }
+}
+
 
   useEffect(() => {
     if (success) {
