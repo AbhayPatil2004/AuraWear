@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function StoreDashboardPage() {
     const { storeId } = useParams();
@@ -9,6 +10,7 @@ export default function StoreDashboardPage() {
 
     const [store, setStore] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [active, setActive] = useState(true)
 
     useEffect(() => {
         if (!storeId) return;
@@ -24,6 +26,10 @@ export default function StoreDashboardPage() {
 
                 const data = await res.json();
                 setStore(data.data);
+                if (!data.data.isActive) {
+                    setActive(false)
+                }
+
             } catch (err) {
                 console.error(err);
             } finally {
@@ -33,6 +39,34 @@ export default function StoreDashboardPage() {
 
         fetchStore();
     }, [storeId]);
+
+    const handelToggleActive = async () => {
+        try {
+            const res = await fetch(
+                `http://localhost:8000/seller/store/toggleactive/${storeId}`,
+                {
+                    method: "PUT",
+                    credentials: "include",
+                }
+            );
+
+            if (!res.ok) {
+                toast.error("Please try again later");
+                return;
+            }
+
+            setActive((prev) => !prev); // UI update
+
+            toast.success(
+                `Store ${active ? "Deactivated" : "Activated"} successfully`
+            );
+
+        } catch (error) {
+            console.log(error);
+            toast.error("Please try again later");
+        }
+    };
+
 
     if (loading) {
         return <div className="min-h-screen bg-white flex items-center justify-center">Loading...</div>;
@@ -193,11 +227,17 @@ export default function StoreDashboardPage() {
                     </button>
 
                     <button
-                        onClick={() => alert("Delete logic here")}
-                        className="w-full border border-red-600 text-red-600 px-6 py-3 rounded-lg cursor-pointer"
+                        onClick={handelToggleActive}
+                        className={`w-full px-6 py-3 rounded-lg cursor-pointer font-medium transition
+    ${active
+                                ? "border border-red-500 text-red-600 hover:bg-red-50"
+                                : "border border-green-500 text-green-600 hover:bg-green-50"
+                            }`}
                     >
-                        🗑 Delete Store
+                        {active ? "Deactivate Store" : "Activate Store"}
                     </button>
+
+
                 </div>
 
 

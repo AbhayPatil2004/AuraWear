@@ -184,7 +184,7 @@ async function handelGetStoreByIdForSeller(req, res) {
 
     const storeDetails = await Store.findById(storeId)
       .select(
-        "storeName storeProducts description logo banner address rating reviews totalProducts totalOrders subscriptionPlan subscriptionStartDate subscriptionEndDate isSubscriptionActive trialEndsAt commissionRate productSales"
+        "storeName storeProducts description logo banner address rating reviews totalProducts totalOrders subscriptionPlan subscriptionStartDate subscriptionEndDate isSubscriptionActive trialEndsAt commissionRate productSales isActive"
       )
       .populate("reviews");
 
@@ -418,5 +418,41 @@ async function handleUpdateStoreDetails(req, res) {
 }
 
 
+async function handelActiveOrInActiveStore(req, res) {
+  try {
+    const { storeId } = req.params;
 
-export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription, handleAddProductToStore, handelSellerStats , handleUpdateStoreDetails }
+    if (!mongoose.Types.ObjectId.isValid(storeId)) {
+      return res.status(400).json(
+        new ApiResponse(400, {}, "Invalid Store Id")
+      );
+    }
+
+    const store = await Store.findById(storeId);
+    if (!store) {
+      return res.status(404).json(
+        new ApiResponse(404, {}, "Store not found")
+      );
+    }
+
+    // toggle
+    store.isActive = !store.isActive;
+
+    await store.save();
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        store,
+        `Store ${store.isActive ? "Activated" : "Deactivated"} Successfully`
+      )
+    );
+  } catch (error) {
+    return res.status(500).json(
+      new ApiResponse(500, {}, "Internal Server Error")
+    );
+  }
+}
+
+
+export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription, handleAddProductToStore, handelSellerStats , handleUpdateStoreDetails , handelActiveOrInActiveStore }
