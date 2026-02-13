@@ -28,7 +28,7 @@ export default function UpdateProductPage() {
     const [images, setImages] = useState([]);
     const [video, setVideo] = useState(null);
 
-    // upload (image/video both)
+    // upload file
     async function uploadImage(file) {
         const data = new FormData();
         data.append("file", file);
@@ -43,6 +43,16 @@ export default function UpdateProductPage() {
         return result.url;
     }
 
+    // image handler
+    const handleImagesChange = (e) => {
+        setImages(Array.from(e.target.files));
+    };
+
+    // video handler
+    const handleVideoChange = (e) => {
+        setVideo(e.target.files[0]);
+    };
+
     useEffect(() => {
         async function fetchProduct() {
             const res = await fetch(
@@ -53,75 +63,73 @@ export default function UpdateProductPage() {
             const data = await res.json();
             const p = data?.data;
 
-            // only for top preview
             setProductInfo({
                 title: p.title,
                 image: p.images?.[0],
             });
-
-            // ❌ form ko prefill mat karo
         }
 
         if (storeId && productId) fetchProduct();
     }, [storeId, productId]);
-    ;
 
     const handleUpdate = async () => {
-        try {
-            setLoading(true);
+    try {
+        setLoading(true);
 
-            const imageUrls = images.length
-                ? await Promise.all(images.map(uploadImage))
-                : [];
+        // 1️⃣ Upload new images only if user selected
+        const imageUrls = images.length
+            ? await Promise.all(images.map(uploadImage))
+            : undefined; // undefined means no update
 
-            const videoUrl = video ? await uploadImage(video) : null;
+        const videoUrl = video ? [await uploadImage(video)] : undefined;
 
-            const payload = {
-                ...form,
-                price: Number(form.price),
-                stock: Number(form.stock),
-                discountPercentage: Number(form.discountPercentage),
-                sizes: form.sizes.split(",").map(s => s.trim()),
-                colors: form.colors.split(",").map(c => c.trim()),
-                tags: form.tags.split(",").map(t => t.trim()),
-                images: imageUrls,
-                video: videoUrl ? [videoUrl] : [],
-            };
+        // 2️⃣ Prepare payload – include only non-empty fields
+        const payload = {};
 
-            const res = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/seller/store/updateproduct/${productId}`,
-                {
-                    method: "PUT",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify(payload),
-                }
-            );
+        if (form.title.trim()) payload.title = form.title;
+        if (form.description.trim()) payload.description = form.description;
+        if (form.price) payload.price = Number(form.price);
+        if (form.stock) payload.stock = Number(form.stock);
+        if (form.category.trim()) payload.category = form.category;
+        if (form.deliveryTime.trim()) payload.deliveryTime = form.deliveryTime;
+        if (form.discountPercentage) payload.discountPercentage = Number(form.discountPercentage);
+        payload.isReturnable = form.isReturnable;
+        if (form.sizes.trim()) payload.sizes = form.sizes.split(",").map(s => s.trim());
+        if (form.colors.trim()) payload.colors = form.colors.split(",").map(c => c.trim());
+        if (form.tags.trim()) payload.tags = form.tags.split(",").map(t => t.trim());
+        if (imageUrls) payload.images = imageUrls;
+        if (videoUrl) payload.video = videoUrl;
 
-            if (!res.ok) throw new Error("Update failed");
+        // 3️⃣ Send update request
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/seller/store/product/${productId}`,
+            {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify(payload),
+            }
+        );
 
-            toast.success("Product updated successfully");
-
-            router.push(
-                `/seller/store/${storeId}/product/${productId}`
-            );
-
-        } catch (err) {
-            toast.error(err.message);
-        } finally {
-            setLoading(false);
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || "Update failed");
         }
-    };
+
+        toast.success("Product updated successfully");
+        router.push(`/seller/store/${storeId}/product/${productId}`);
+
+    } catch (err) {
+        toast.error(err.message);
+    } finally {
+        setLoading(false);
+    }
+};
+
 
     return (
         <div className="max-w-4xl mx-auto p-8 space-y-8">
 
-            {/* PAGE HEADING */}
-            {/* <h1 className="text-3xl font-semibold text-center">
-                Update Product Details
-            </h1> */}
-
-            {/* TOP PRODUCT INFO */}
             {productInfo && (
                 <div className="flex items-center gap-4 bg-white p-6 rounded-xl shadow">
                     <img
@@ -132,74 +140,42 @@ export default function UpdateProductPage() {
                 </div>
             )}
 
-            {/* FORM */}
             <div className="bg-white p-8 rounded-2xl shadow space-y-5">
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">Product Title</label>
-                    <input
-                        className="input-modern"
-                        value={form.title}
-                        onChange={(e) => setForm({ ...form, title: e.target.value })}
-                    />
-                </div>
+                <input className="input-modern" placeholder="Title"
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                />
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">Description</label>
-                    <textarea
-                        className="input-modern"
-                        value={form.description}
-                        onChange={(e) => setForm({ ...form, description: e.target.value })}
-                    />
-                </div>
+                <textarea className="input-modern" placeholder="Description"
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                />
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">Price</label>
-                    <input
-                        type="number"
-                        className="input-modern"
-                        value={form.price}
-                        onChange={(e) => setForm({ ...form, price: e.target.value })}
-                    />
-                </div>
+                <input type="number" className="input-modern" placeholder="Price"
+                    value={form.price}
+                    onChange={(e) => setForm({ ...form, price: e.target.value })}
+                />
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">Stock</label>
-                    <input
-                        type="number"
-                        className="input-modern"
-                        value={form.stock}
-                        onChange={(e) => setForm({ ...form, stock: e.target.value })}
-                    />
-                </div>
+                <input type="number" className="input-modern" placeholder="Stock"
+                    value={form.stock}
+                    onChange={(e) => setForm({ ...form, stock: e.target.value })}
+                />
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">Category</label>
-                    <input
-                        className="input-modern"
-                        value={form.category}
-                        onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    />
-                </div>
+                <input className="input-modern" placeholder="Category"
+                    value={form.category}
+                    onChange={(e) => setForm({ ...form, category: e.target.value })}
+                />
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">Delivery Time</label>
-                    <input
-                        className="input-modern"
-                        value={form.deliveryTime}
-                        onChange={(e) => setForm({ ...form, deliveryTime: e.target.value })}
-                    />
-                </div>
+                <input className="input-modern" placeholder="Delivery Time"
+                    value={form.deliveryTime}
+                    onChange={(e) => setForm({ ...form, deliveryTime: e.target.value })}
+                />
 
-                <div>
-                    <label className="block text-sm font-medium mb-1">Discount Percentage</label>
-                    <input
-                        type="number"
-                        className="input-modern"
-                        value={form.discountPercentage}
-                        onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })}
-                    />
-                </div>
+                <input type="number" className="input-modern" placeholder="Discount %"
+                    value={form.discountPercentage}
+                    onChange={(e) => setForm({ ...form, discountPercentage: e.target.value })}
+                />
 
                 <label className="flex items-center gap-2">
                     <input
@@ -210,30 +186,39 @@ export default function UpdateProductPage() {
                     Returnable Product
                 </label>
 
+                <input className="input-modern" placeholder="Sizes (S,M,L)"
+                    value={form.sizes}
+                    onChange={(e) => setForm({ ...form, sizes: e.target.value })}
+                />
+
+                <input className="input-modern" placeholder="Colors"
+                    value={form.colors}
+                    onChange={(e) => setForm({ ...form, colors: e.target.value })}
+                />
+
+                <input className="input-modern" placeholder="Tags"
+                    value={form.tags}
+                    onChange={(e) => setForm({ ...form, tags: e.target.value })}
+                />
+
+                {/* Images */}
                 <div>
-                    <label className="block text-sm font-medium mb-1">Sizes (comma separated)</label>
+                    <label className="block text-sm font-medium mb-1">Upload Images (multiple)</label>
                     <input
-                        className="input-modern"
-                        value={form.sizes}
-                        onChange={(e) => setForm({ ...form, sizes: e.target.value })}
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleImagesChange}
                     />
                 </div>
 
+                {/* Video */}
                 <div>
-                    <label className="block text-sm font-medium mb-1">Colors (comma separated)</label>
+                    <label className="block text-sm font-medium mb-1">Upload Video (single)</label>
                     <input
-                        className="input-modern"
-                        value={form.colors}
-                        onChange={(e) => setForm({ ...form, colors: e.target.value })}
-                    />
-                </div>
-
-                <div>
-                    <label className="block text-sm font-medium mb-1">Tags (comma separated)</label>
-                    <input
-                        className="input-modern"
-                        value={form.tags}
-                        onChange={(e) => setForm({ ...form, tags: e.target.value })}
+                        type="file"
+                        accept="video/*"
+                        onChange={handleVideoChange}
                     />
                 </div>
 
@@ -246,9 +231,6 @@ export default function UpdateProductPage() {
             >
                 {loading ? "Updating..." : "Update Product"}
             </button>
-
-
         </div>
     );
-
 }

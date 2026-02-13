@@ -1,7 +1,7 @@
 import express from 'express'
 import handelUserAuthorization from '../middleware/seller.authorized.middleware.js'
 import { handelUserAuthentication } from '../middleware/authenticate.middleware.js'
-import { handelGetStoreByIdForSeller , handelGetStoreByOwner , handelUpgradeStoreSubscription , handelCreateStoreSubscriptionOrder , handleAddProductToStore , handelSellerStats , handleUpdateStoreDetails , handelActiveOrInActiveStore , handelGetStoreProducts, handelGetProductDetails , handelActiveOrInActiveProduct } from '../controllers/seller.controller.js'
+import { handelGetStoreByIdForSeller , handelGetStoreByOwner , handelUpgradeStoreSubscription , handelCreateStoreSubscriptionOrder , handleAddProductToStore , handelSellerStats , handleUpdateStoreDetails , handelActiveOrInActiveStore , handelGetStoreProducts, handelGetProductDetails , handelActiveOrInActiveProduct , handelUpdateProductDetails } from '../controllers/seller.controller.js'
 
 const router = express.Router()
 
@@ -10,6 +10,7 @@ router.get("/store/:storeId" , handelUserAuthentication , handelUserAuthorizatio
 router.get("/store/:storeId/products" , handelUserAuthentication , handelUserAuthorization , handelGetStoreProducts )
 router.get("/store/:storeId/products/:productId" , handelUserAuthentication , handelUserAuthorization , handelGetProductDetails )
 router.put("/store/:storeId" , handelUserAuthentication , handelUserAuthorization ,  handleUpdateStoreDetails )
+router.put("/store/product/:productId" , handelUserAuthentication , handelUserAuthorization ,  handelUpdateProductDetails )
 router.put("/store/toggleactive/:storeId" , handelUserAuthentication , handelUserAuthorization ,  handelActiveOrInActiveStore )
 router.put("/store/product/toggleactive/:productId" , handelUserAuthentication , handelUserAuthorization ,  handelActiveOrInActiveProduct )
 // router.put("/store/inactive/:storeId" , handelUserAuthentication , handelUserAuthorization ,  handelActiveOrInActiveStore )

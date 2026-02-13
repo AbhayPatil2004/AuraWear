@@ -491,7 +491,6 @@ async function handelActiveOrInActiveProduct(req, res) {
 }
 
 
-
 async function handelGetStoreProducts(req, res) {
   try {
     const { storeId } = req.params;
@@ -576,4 +575,156 @@ async function handelGetProductDetails(req, res) {
 }
 
 
-export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription, handleAddProductToStore, handelSellerStats, handleUpdateStoreDetails, handelActiveOrInActiveStore, handelGetStoreProducts, handelGetProductDetails , handelActiveOrInActiveProduct }
+// async function handelUpdateProductDetails(req, res) {
+//   try {
+//     const { productId } = req.params;
+//     const updateData = req.body;
+
+//     // 1️⃣ Check if product exists
+//     const product = await Product.findById(productId);
+
+//     if (!product || product.isDeleted) {
+//       return res
+//         .status(404)
+//         .json(new ApiResponse(404, {}, "Product not found"));
+//     }
+
+//     // 2️⃣ If no data sent
+//     if (!updateData || Object.keys(updateData).length === 0) {
+//       return res
+//         .status(400)
+//         .json(new ApiResponse(400, {}, "No data provided to update"));
+//     }
+
+//     // 3️⃣ Allowed fields
+//     const allowedFields = [
+//       "title",
+//       "description",
+//       "price",
+//       "stock",
+//       "category",
+//       "deliveryTime",
+//       "discountPercentage",
+//       "isReturnable",
+//       "sizes",
+//       "colors",
+//       "tags",
+//       "gender",
+//       "images",
+//       "video",
+//       "isActive",
+//     ];
+
+//     const updateFields = {};
+
+//     // 4️⃣ Add only fields that are sent from frontend
+//     allowedFields.forEach((field) => {
+//       if (field in updateData) {
+//         updateFields[field] = updateData[field];
+//       }
+//     });
+
+//     // 5️⃣ Recalculate finalPrice ONLY if price or discount updated
+//     if ("price" in updateFields || "discountPercentage" in updateFields) {
+//       const newPrice =
+//         updateFields.price !== undefined
+//           ? updateFields.price
+//           : product.price;
+
+//       const newDiscount =
+//         updateFields.discountPercentage !== undefined
+//           ? updateFields.discountPercentage
+//           : product.discountPercentage;
+
+//       updateFields.finalPrice =
+//         newPrice - (newPrice * newDiscount) / 100;
+//     }
+
+//     // 6️⃣ Update product
+//     const updatedProduct = await Product.findByIdAndUpdate(
+//       productId,
+//       { $set: updateFields },
+//       { new: true, runValidators: true }
+//     );
+
+//     return res
+//       .status(200)
+//       .json(
+//         new ApiResponse(200, updatedProduct, "Product updated successfully")
+//       );
+
+//   } catch (error) {
+//     console.log("Error in handelUpdateProductDetails:", error);
+//     return res
+//       .status(500)
+//       .json(new ApiResponse(500, {}, "Internal Server Error"));
+//   }
+// }
+
+
+const handelUpdateProductDetails = async (req, res) => {
+    try {
+        const { productId } = req.params;
+
+        // 1️⃣ Find the existing product
+        const existingProduct = await Product.findById(productId);
+        if (!existingProduct) {
+            return res.status(404).json({ message: "Product not found" });
+        }
+
+        // 2️⃣ Prepare update data
+        const updateData = {};
+
+        // Only copy fields that exist in the request body
+        const fields = [
+            "title",
+            "description",
+            "price",
+            "stock",
+            "category",
+            "deliveryTime",
+            "discountPercentage",
+            "isReturnable",
+            "sizes",
+            "colors",
+            "tags",
+            "images",
+            "video"
+        ];
+
+        fields.forEach((field) => {
+    if (req.body[field] !== undefined && req.body[field] !== null) {
+        let value = req.body[field];
+
+        // Ensure numbers stay within schema limits
+        if (field === "price") value = Math.max(0, Number(value));
+        if (field === "discountPercentage") value = Math.min(90, Math.max(0, Number(value)));
+
+        updateData[field] = value;
+    }
+});
+
+
+        // 3️⃣ Update the product
+        const updatedProduct = await Product.findByIdAndUpdate(
+            productId,
+            updateData,
+            { new: true, runValidators: true }
+        );
+
+        res.status(200).json({
+            message: "Product updated successfully",
+            updatedProduct
+        });
+
+    } catch (error) {
+        console.error("Error in handelUpdateProductDetails:", error);
+        res.status(500).json({ message: "Something went wrong", error: error.message });
+    }
+};
+
+
+
+
+
+export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription, handleAddProductToStore, handelSellerStats, handleUpdateStoreDetails, handelActiveOrInActiveStore, handelGetStoreProducts, handelGetProductDetails , handelActiveOrInActiveProduct , handelUpdateProductDetails }
