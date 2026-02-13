@@ -1,29 +1,47 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function ProfileIcon() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [open, setOpen] = useState(false);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
-  const storedUser = localStorage.getItem("user");
-  if (!storedUser) return;
+    const storedUser = localStorage.getItem("user");
+    if (!storedUser) return;
 
-  try {
-    const parsed = JSON.parse(storedUser);
+    try {
+      const parsed = JSON.parse(storedUser);
+      setUser(parsed.value);
+    } catch {
+      localStorage.removeItem("user");
+    }
+  }, []);
 
-    // 👇 yahi main fix hai
-    setUser(parsed.value);
-  } catch {
-    localStorage.removeItem("user");
-  }
-}, []);
+  // Close dropdown if click outside
+  useEffect(() => {
+    function handleClickOutside(e) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    }
 
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
+    }
 
-  // If user clicks avatar but not logged in
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
+
+  // Avatar click handler
   const handleAvatarClick = () => {
     if (!user) {
       router.push("/auth/signin");
@@ -32,30 +50,32 @@ export default function ProfileIcon() {
     }
   };
 
+  // Logout handler
   const handleLogout = async () => {
-  try {
-    await fetch("http://localhost:8000/user/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-  } catch (err) {
-    console.error("Logout failed", err);
-  } finally {
-    // Always clear client state
-    localStorage.removeItem("user");
-    // router.replace("/auth/signin"); // or "/"
-  }
-};
+    try {
+      await fetch("http://localhost:8000/user/logout", {
+        method: "POST",
+        credentials: "include",
+      });
 
+      localStorage.removeItem("user");
+      setUser(null);
+      setOpen(false);
+      toast.success("Logout successful");
+    } catch (err) {
+      console.error("Logout failed", err);
+      toast.error("Logout failed");
+    }
+  };
 
   const initials = user?.username
     ?.split(" ")
-    .map(w => w[0])
+    .map((w) => w[0])
     .join("")
     .toUpperCase();
 
   return (
-    <div className="relative">
+    <div className="relative" ref={dropdownRef}>
       {/* Avatar */}
       <div
         onClick={handleAvatarClick}
@@ -70,9 +90,7 @@ export default function ProfileIcon() {
             className="w-full h-full object-cover"
           />
         ) : (
-          <span className="text-gray-700">
-            {user ? initials : "?"}
-          </span>
+          <span className="text-gray-700">{user ? initials : "?"}</span>
         )}
       </div>
 
@@ -100,25 +118,55 @@ export default function ProfileIcon() {
 
             {user.role === "seller" && (
               <>
-                <MenuItem label="Seller Dashboard" />
-                <MenuItem label="My Stores" />
-                <MenuItem label="User compailents" />
-                <MenuItem label="Open Store" />
+                <MenuItem
+                  label="Seller Dashboard"
+                  onClick={() => router.push("/seller/dashboard")}
+                />
+                <MenuItem
+                  label="My Stores"
+                  onClick={() => router.push("/seller/store")}
+                />
+                <MenuItem
+                  label="Orders"
+                  onClick={() => router.push("/seller/orders")}
+                />
+                <MenuItem
+                  label="User complaints"
+                  onClick={() => router.push("/seller/complaints")}
+                />
+                <MenuItem
+                  label="Open Store"
+                  onClick={() => router.push("/seller/open-store")}
+                />
               </>
             )}
 
             {user.role === "admin" && (
               <>
-
-              <MenuItem label="Admin Dashboard" />
-              <MenuItem label="User compailents" />
+                <MenuItem
+                  label="Admin Dashboard"
+                  onClick={() => router.push("/admin/dashboard")}
+                />
+                <MenuItem
+                  label="Users Management"
+                  onClick={() => router.push("/admin/users")}
+                />
+                <MenuItem
+                  label="Sellers Management"
+                  onClick={() => router.push("/admin/sellers")}
+                />
+                <MenuItem
+                  label="Orders Management"
+                  onClick={() => router.push("/admin/orders")}
+                />
+                <MenuItem
+                  label="Complaints"
+                  onClick={() => router.push("/admin/complaints")}
+                />
               </>
             )}
 
-            <MenuItem
-              label="Profile"
-              onClick={() => router.push("/profile")}
-            />
+            <MenuItem label="Profile" onClick={() => router.push("/profile")} />
           </div>
 
           {/* Logout */}
@@ -138,13 +186,11 @@ export default function ProfileIcon() {
 }
 
 /* -------- Menu Item -------- */
-
 function MenuItem({ label, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="w-full text-left px-4 py-2 text-sm
-                 hover:bg-gray-100 transition"
+      className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition"
     >
       {label}
     </button>

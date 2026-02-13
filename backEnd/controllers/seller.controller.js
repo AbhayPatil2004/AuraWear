@@ -662,69 +662,142 @@ async function handelGetProductDetails(req, res) {
 // }
 
 
-const handelUpdateProductDetails = async (req, res) => {
-    try {
-        const { productId } = req.params;
+// const handelUpdateProductDetails = async (req, res) => {
+//   try {
+//     const { productId } = req.params;
 
-        // 1️⃣ Find the existing product
-        const existingProduct = await Product.findById(productId);
-        if (!existingProduct) {
-            return res.status(404).json({ message: "Product not found" });
+//     // 1️⃣ Find the existing product
+//     const existingProduct = await Product.findById(productId);
+//     if (!existingProduct) {
+//       return res.status(404).json({ message: "Product not found" });
+//     }
+
+//     // 2️⃣ Prepare update data
+//     const updateData = {};
+
+//     // Only copy fields that exist in the request body
+//     const fields = [
+//       "title",
+//       "description",
+//       "price",
+//       "stock",
+//       "category",
+//       "deliveryTime",
+//       "discountPercentage",
+//       "isReturnable",
+//       "sizes",
+//       "colors",
+//       "tags",
+//       "images",
+//       "video"
+//     ];
+
+//     fields.forEach((field) => {
+//       const value = req.body[field];
+
+//       if (value !== undefined && value !== null && value !== "") {
+//         let finalValue = value;
+
+//         // Only convert numbers if user sent a value
+//         if (field === "price") finalValue = Number(value);
+//         if (field === "discountPercentage") finalValue = Number(value);
+
+//         // Clamp to schema limits
+//         if (field === "price") finalValue = Math.max(0, finalValue);
+//         if (field === "discountPercentage") finalValue = Math.min(90, Math.max(0, finalValue));
+
+//         updateData[field] = finalValue;
+//       }
+//     });
+
+//     // 3️⃣ Update the product
+//     const updatedProduct = await Product.findByIdAndUpdate(
+//       productId,
+//       updateData,
+//       { new: true, runValidators: true }
+//     );
+
+//     res.status(200).json({
+//       message: "Product updated successfully",
+//       updatedProduct
+//     });
+
+//   } catch (error) {
+//     console.error("Error in handelUpdateProductDetails:", error);
+//     res.status(500).json({ message: "Something went wrong", error: error.message });
+//   }
+// };
+
+const handelUpdateProductDetails = async (req, res) => {
+  try {
+    const { productId } = req.params;
+
+    const existingProduct = await Product.findById(productId);
+    if (!existingProduct) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const updateData = {};
+
+    const fields = [
+      "title",
+      "description",
+      "price",
+      "stock",
+      "category",
+      "deliveryTime",
+      "discountPercentage",
+      "isReturnable",
+      "sizes",
+      "colors",
+      "tags",
+      "images",
+      "video"
+    ];
+
+    fields.forEach((field) => {
+      const value = req.body[field];
+
+      if (value !== undefined && value !== null) { // allow 0
+        let finalValue = value;
+
+        if (field === "price" || field === "discountPercentage") {
+          finalValue = Number(value);
+          if (field === "price") finalValue = Math.max(0, finalValue);
+          if (field === "discountPercentage") finalValue = Math.min(90, Math.max(0, finalValue));
         }
 
-        // 2️⃣ Prepare update data
-        const updateData = {};
+        updateData[field] = finalValue;
+      }
+    });
 
-        // Only copy fields that exist in the request body
-        const fields = [
-            "title",
-            "description",
-            "price",
-            "stock",
-            "category",
-            "deliveryTime",
-            "discountPercentage",
-            "isReturnable",
-            "sizes",
-            "colors",
-            "tags",
-            "images",
-            "video"
-        ];
-
-        fields.forEach((field) => {
-    if (req.body[field] !== undefined && req.body[field] !== null) {
-        let value = req.body[field];
-
-        // Ensure numbers stay within schema limits
-        if (field === "price") value = Math.max(0, Number(value));
-        if (field === "discountPercentage") value = Math.min(90, Math.max(0, Number(value)));
-
-        updateData[field] = value;
+    // ✅ compute finalPrice if price or discountPercentage updated
+    if (updateData.price !== undefined || updateData.discountPercentage !== undefined) {
+      const price = updateData.price !== undefined ? updateData.price : existingProduct.price;
+      const discount = updateData.discountPercentage !== undefined ? updateData.discountPercentage : existingProduct.discountPercentage;
+      updateData.finalPrice = price - (price * discount / 100);
     }
-});
 
+    const updatedProduct = await Product.findByIdAndUpdate(
+      productId,
+      updateData,
+      { new: true, runValidators: true }
+    );
 
-        // 3️⃣ Update the product
-        const updatedProduct = await Product.findByIdAndUpdate(
-            productId,
-            updateData,
-            { new: true, runValidators: true }
-        );
+    res.status(200).json({
+      message: "Product updated successfully",
+      updatedProduct
+    });
 
-        res.status(200).json({
-            message: "Product updated successfully",
-            updatedProduct
-        });
-
-    } catch (error) {
-        console.error("Error in handelUpdateProductDetails:", error);
-        res.status(500).json({ message: "Something went wrong", error: error.message });
-    }
+  } catch (error) {
+    console.error("Error in handelUpdateProductDetails:", error);
+    res.status(500).json({ message: "Something went wrong", error: error.message });
+  }
 };
 
 
 
 
 
-export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription, handleAddProductToStore, handelSellerStats, handleUpdateStoreDetails, handelActiveOrInActiveStore, handelGetStoreProducts, handelGetProductDetails , handelActiveOrInActiveProduct , handelUpdateProductDetails }
+
+export { handelGetStoreByIdForSeller, handelGetStoreByOwner, handelCreateStoreSubscriptionOrder, handelUpgradeStoreSubscription, handleAddProductToStore, handelSellerStats, handleUpdateStoreDetails, handelActiveOrInActiveStore, handelGetStoreProducts, handelGetProductDetails, handelActiveOrInActiveProduct, handelUpdateProductDetails }
