@@ -9,6 +9,9 @@ export function middleware(req) {
     "/",
     "/auth/login",
     "/auth/signup",
+    "/auth/forgotpassword",
+    "/verifyforgotpassword",
+    "/verifyemail",
   ];
 
   // ✅ Prefix-based public routes

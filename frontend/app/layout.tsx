@@ -5,6 +5,7 @@ import Header from './layout/component/Header.jsx'
 import Footer from './layout/component/Footer.jsx'
 import { Toaster } from "react-hot-toast";
 
+import { AuthProvider } from './context/Authcontext'
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,23 +29,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Header />
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        
+        {/* ✅ Wrap entire app with AuthProvider */}
+        <AuthProvider>
+          <Header />
 
-        {/* Push content below sticky header */}
-        <main >
-          {/* {children} */}
-          <>
-            <Toaster position="top-center" />
-            {children}
-          </>
-        </main>
+          {/* Push content below sticky header */}
+          <main>
+            <>
+              <Toaster position="top-center" />
+              {children}
+            </>
+          </main>
 
-        <Footer />
+          <Footer />
+        </AuthProvider>
+
       </body>
     </html>
   );
 }
-

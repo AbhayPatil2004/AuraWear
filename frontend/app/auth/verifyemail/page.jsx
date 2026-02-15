@@ -2,19 +2,20 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+import { useAuth } from "../../context/Authcontext"; // ✅ AuthContext import
 
 export default function VerifyEmailOtpPage() {
+  const router = useRouter();
+  const { setUser } = useAuth(); // ✅ global user updater
+
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const router = useRouter();
-
   async function handleSubmit(e) {
     e.preventDefault();
-    setMessage("");
-    setError("");
     setLoading(true);
 
     try {
@@ -28,41 +29,56 @@ export default function VerifyEmailOtpPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Invalid OTP");
+        toast.error(data.message || "Invalid OTP");
       } else {
-        setMessage(data.message || "Email verified successfully");
+        toast.success(data.message || "Email verified successfully");
 
-        
+        // ✅ update global user after verification
+        const storedUser = localStorage.getItem("user");
+        if (storedUser) {
+          try {
+            const parsed = JSON.parse(storedUser);
+            const updatedUser = { ...parsed.value, emailVerified: true }; // example field
+            const now = new Date();
+            const item = {
+              value: updatedUser,
+              expiry: now.getTime() + 7 * 24 * 60 * 60 * 1000,
+            };
+            localStorage.setItem("user", JSON.stringify(item));
+            setUser(updatedUser); // ✅ update global user
+          } catch {
+            localStorage.removeItem("user");
+          }
+        }
+
         setTimeout(() => {
-          router.push("/");
-        }, 1500);
+          router.refresh();   // refresh UI
+          router.push("/");   // redirect home
+        }, 1200);
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      toast.error("Please try again after some time");
     } finally {
       setLoading(false);
     }
   }
 
-  async function resendOtp(e){
-
-    e.preventDefault()
-    try{
-      const res = await fetch("http://localhost:8000/user/resendotp" , {
-        method : "POST",
+  async function resendOtp(e) {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:8000/user/resendotp", {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-      })
+      });
 
-      const data = await res.json()
-      if( res.ok ){
-        setMessage(data.message || "Otp Send Succesfully");
+      const data = await res.json();
+      if (res.ok) {
+        setMessage(data.message || "OTP sent successfully");
+      } else {
+        setError(data.message || "Something went wrong. Please try again.");
       }
-      else{
-        setError( data.message || "Something went wrong. Please try again.");
-      }
-    }
-    catch(error){
+    } catch {
       setError("Something went wrong. Please try again.");
     }
   }
@@ -73,21 +89,17 @@ export default function VerifyEmailOtpPage() {
 
         {/* Header */}
         <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">
-            Verify Email
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-800">Verify Email</h1>
           <p className="text-gray-500 text-sm mt-1">
             Enter the OTP sent to your email 📧
           </p>
         </div>
 
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
 
-          {/* OTP */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              OTP
-            </label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">OTP</label>
             <input
               type="text"
               value={otp}
@@ -100,25 +112,22 @@ export default function VerifyEmailOtpPage() {
             />
           </div>
 
-          {/* Error */}
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 text-sm rounded-lg px-3 py-2">
               {error}
             </div>
           )}
 
-          {/* Success */}
           {message && (
             <div className="bg-green-50 border border-green-200 text-green-600 text-sm rounded-lg px-3 py-2">
               {message}
             </div>
           )}
 
-          {/* Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold hover:opacity-90 transition disabled:opacity-60"
+            className="cursor-pointer w-full py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold hover:opacity-90 transition disabled:opacity-60"
           >
             {loading ? "Verifying..." : "Verify OTP"}
           </button>
@@ -127,7 +136,7 @@ export default function VerifyEmailOtpPage() {
         {/* Footer */}
         <p className="text-center text-sm text-gray-500 mt-6">
           Didn’t receive OTP?{" "}
-          <span className="text-blue-600 hover:underline cursor-pointer "  onClick={ resendOtp }>
+          <span className="text-blue-600 hover:underline cursor-pointer" onClick={resendOtp}>
             Resend
           </span>
         </p>

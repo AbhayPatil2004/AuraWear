@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
+
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -13,8 +15,6 @@ export default function ForgotPasswordPage() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-    setMessage("");
-    setError("");
     setLoading(true);
 
     try {
@@ -27,11 +27,11 @@ export default function ForgotPasswordPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.message || "Failed to send OTP");
+        toast.error(data.message || "Please try again after some time");
       } else {
-        setMessage(data.message || "OTP sent to your email");
+        toast.success(data.message || "OTP sent successfully");
 
-        // ✅ store email for next steps
+        // store email
         localStorage.setItem("forgotEmail", email);
 
         setTimeout(() => {
@@ -39,11 +39,12 @@ export default function ForgotPasswordPage() {
         }, 1200);
       }
     } catch {
-      setError("Something went wrong. Please try again.");
+      toast.error("Please try again after some time");
     } finally {
       setLoading(false);
     }
   }
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
@@ -90,7 +91,7 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600
+            className="cursor-pointer w-full py-2.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600
                        text-white font-semibold hover:opacity-90 transition disabled:opacity-60"
           >
             {loading ? "Sending OTP..." : "Send OTP"}
