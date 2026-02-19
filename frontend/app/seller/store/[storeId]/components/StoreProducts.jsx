@@ -12,7 +12,7 @@ export default function StoreProductsPage() {
     useEffect(() => {
         async function fetchProducts() {
             try {
-                const res = await fetch(`http://localhost:8000/seller/store/${storeId}/products`, {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/seller/store/${storeId}/products`, {
                     method: "GET",
                     credentials: "include",   // agar cookies use kar rahe ho
                 });

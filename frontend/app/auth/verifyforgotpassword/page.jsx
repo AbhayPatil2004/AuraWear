@@ -21,7 +21,7 @@ export default function VerifyEmailOtpPage() {
     const email = localStorage.getItem("forgotEmail");
 
     try {
-      const res = await fetch("http://localhost:8000/user/verifyforgotpassword", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/verifyforgotpassword`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),

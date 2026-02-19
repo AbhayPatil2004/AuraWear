@@ -18,7 +18,7 @@ export default function StoreDashboardPage() {
         const fetchStore = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:8000/seller/store/${storeId}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/seller/store/${storeId}`,
                     { credentials: "include" }
                 );
 
@@ -43,7 +43,7 @@ export default function StoreDashboardPage() {
     const handelToggleActive = async () => {
         try {
             const res = await fetch(
-                `http://localhost:8000/seller/store/toggleactive/${storeId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/seller/store/toggleactive/${storeId}`,
                 {
                     method: "PUT",
                     credentials: "include",

@@ -307,7 +307,7 @@ export default function ProfileIcon() {
   // Logout handler
   const handleLogout = async () => {
     try {
-      await fetch("http://localhost:8000/user/logout", {
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/logout`, {
         method: "POST",
         credentials: "include",
       });

@@ -23,7 +23,7 @@ const StoreDetailsPage = () => {
         const fetchStoreDetails = async () => {
             try {
                 const res = await fetch(
-                    `http://localhost:8000/admin/store/${storeId}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/admin/store/${storeId}`,
                     {
                         credentials: "include"
                     }
@@ -51,7 +51,7 @@ const StoreDetailsPage = () => {
             let res;
             if (type == "approve") {
                 res = await fetch(
-                    `http://localhost:8000/admin/accept/${storeId}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/admin/accept/${storeId}`,
                     {
                         method: "PATCH",
                         credentials: "include"
@@ -60,7 +60,7 @@ const StoreDetailsPage = () => {
             }
             else {
                 res = await fetch(
-                    `http://localhost:8000/admin/reject/${storeId}`,
+                    `${process.env.NEXT_PUBLIC_API_URL}/admin/reject/${storeId}`,
                     {
                         method: "PATCH",
                         credentials: "include"

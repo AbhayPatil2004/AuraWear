@@ -165,7 +165,7 @@ export default function ProductDetailsPage() {
     useEffect(() => {
         async function fetchProduct() {
             const res = await fetch(
-                `http://localhost:8000/seller/store/${storeId}/products/${productId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/seller/store/${storeId}/products/${productId}`,
                 { credentials: "include" }
             );
 
@@ -187,7 +187,7 @@ export default function ProductDetailsPage() {
     async function handelToggleActive() {
         try {
             const res = await fetch(
-                `http://localhost:8000/seller/store/product/toggleactive/${productId}`,
+                `${process.env.NEXT_PUBLIC_API_URL}/seller/store/product/toggleactive/${productId}`,
 
                 {
                     credentials: "include",

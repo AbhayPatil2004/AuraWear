@@ -48,7 +48,7 @@ export default function ProfilePage() {
     // 🔹 Fetch profile
     async function fetchProfile() {
         try {
-            const res = await fetch("http://localhost:8000/user", {
+            const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
                 method: "GET",
                 credentials: "include",
             });

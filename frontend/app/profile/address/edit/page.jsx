@@ -24,7 +24,7 @@ export default function UpdateAddressPage() {
     useEffect(() => {
         async function fetchAddress() {
             try {
-                const res = await fetch("http://localhost:8000/user", {
+                const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user`, {
                     method: "GET",
                     credentials: "include",
                 });
@@ -54,7 +54,7 @@ export default function UpdateAddressPage() {
         try {
             setLoading(true);
 
-            await fetch("http://localhost:8000/user/address", {
+            await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/address`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 credentials: "include",

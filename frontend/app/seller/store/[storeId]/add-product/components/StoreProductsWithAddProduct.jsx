@@ -16,7 +16,7 @@ export default function StoreDetailsWithAddProduct() {
     const fetchStore = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8000/seller/store/${storeId}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/seller/store/${storeId}`,
           { credentials: "include" }
         );
 

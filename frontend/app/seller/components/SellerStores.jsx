@@ -22,7 +22,7 @@ export default function SellerStores() {
     async function fetchStores() {
       try {
         const res = await fetch(
-          `http://localhost:8000/seller/owner/${user.value._id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/seller/owner/${user.value._id}`,
           { credentials: "include" }
         );
         const data = await res.json();
