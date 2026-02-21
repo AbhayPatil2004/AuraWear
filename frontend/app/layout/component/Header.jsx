@@ -35,9 +35,9 @@ export default function Header() {
 
           {/* Nav */}
           <nav className="flex items-center gap-10 text-gray-700">
-            <Link className="hover:text-indigo-600 transition" href="/home">Home</Link>
-            <Link className="hover:text-indigo-600 transition" href="/product">Products</Link>
+            {/* <Link className="hover:text-indigo-600 transition" href="/home">Home</Link> */}
             <Link className="hover:text-indigo-600 transition" href="/store">Stores</Link>
+            <Link className="hover:text-indigo-600 transition" href="/product">Products</Link>
             {role !== "admin" && (
               <Link
                 href="/store/create"
@@ -90,21 +90,21 @@ export default function Header() {
       {/* ================= MOBILE BOTTOM NAV ================= */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t">
         <div className="flex justify-around items-center h-16 text-[11px] text-gray-600">
-          <Link href="/home" className="flex flex-col items-center gap-1 hover:text-indigo-600">
+          {/* <Link href="/home" className="flex flex-col items-center gap-1 hover:text-indigo-600">
             <Home size={20} />
             Home
+          </Link> */}
+          <Link href="/store" className="flex flex-col items-center gap-1 hover:text-indigo-600">
+            <ShoppingBag size={20} />
+            Stores
           </Link>
           <Link href="/product" className="flex flex-col items-center gap-1 hover:text-indigo-600">
             <Boxes size={20} />
             Products
           </Link>
-          <Link href="/store" className="flex flex-col items-center gap-1 hover:text-indigo-600">
-            <ShoppingBag size={20} />
-            Stores
-          </Link>
           {role !== "admin" && (
             <Link
-              href="/sell"
+              href="/store/create"
               className="flex flex-col items-center gap-1 text-indigo-600"
             >
               <DollarSign size={20} />
