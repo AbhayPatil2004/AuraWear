@@ -1,13 +1,15 @@
 import React from 'react'
-import SearchBar from './components/HomeSearchBar'
+// import SearchBar from './components/HomeSearchBar'
 import HeroSection from './components/HomeHeroSection'
+import CategoriesSection from './components/HomeCategorySection'
 
 function page() {
   return (
     
     <div>
-      <SearchBar></SearchBar>
+      {/* <SearchBar></SearchBar> */}
       <HeroSection></HeroSection>
+      <CategoriesSection></CategoriesSection>
     </div>
   )
 }
